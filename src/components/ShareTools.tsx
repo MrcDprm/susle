@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { dict, type Lang } from '@/lib/i18n'
 import { CopyField } from './CopyField'
+import { OpenInBrowser, useInApp } from './OpenInBrowser'
 
 // Paylaşım linki, telefonun paylaş menüsü, WhatsApp, X ve Instagram hikayesi bir arada.
 export function ShareTools({ lang, treeId, shareUrl }: { lang: Lang; treeId: string; shareUrl: string }) {
@@ -99,15 +100,17 @@ function StoryShare({ lang, treeId }: { lang: Lang; treeId: string }) {
 }
 
 // 1 Ocak 00:00 için takvim hatırlatıcısı: telefonun takvimine alarmlı etkinlik ya da Google Takvim.
-export function Reminder({ lang, treeId, treeName, revealAt, shareUrl, compact }: {
+export function Reminder({ lang, treeId, treeName, revealAt, shareUrl, compact, ownerUrl }: {
   lang: Lang
   treeId: string
   treeName: string
   revealAt: string
   shareUrl: string
   compact?: boolean
+  ownerUrl?: string
 }) {
   const t = dict(lang)
+  const inApp = useInApp()
   const start = new Date(revealAt)
   const end = new Date(start.getTime() + 30 * 60 * 1000)
   const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
@@ -117,6 +120,16 @@ export function Reminder({ lang, treeId, treeName, revealAt, shareUrl, compact }
     dates: `${fmt(start)}/${fmt(end)}`,
     details: `${t.reminder.body} ${shareUrl}`,
   })}`
+
+  // Uygulama içi tarayıcı takvim dosyasını iletmez, Google Takvim de giriş ister.
+  if (inApp) {
+    return (
+      <div className={`reminder ${compact ? 'is-compact' : ''}`}>
+        {!compact && <span className="field-label">{t.reminder.label}</span>}
+        <OpenInBrowser lang={lang} inApp={inApp} compact url={ownerUrl} />
+      </div>
+    )
+  }
 
   return (
     <div className={`reminder ${compact ? 'is-compact' : ''}`}>
