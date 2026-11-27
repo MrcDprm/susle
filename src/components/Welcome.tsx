@@ -46,7 +46,7 @@ export function Welcome({ lang, treeId, treeName, shareUrl, ownerUrl, revealAt, 
       <h3 className="step-title">
         <span>3</span> {t.welcome.remind}
       </h3>
-      <Reminder lang={lang} treeId={treeId} treeName={treeName} revealAt={revealAt} shareUrl={shareUrl} compact />
+      <Reminder lang={lang} treeId={treeId} treeName={treeName} revealAt={revealAt} shareUrl={shareUrl} ownerUrl={ownerUrl} compact />
 
       <label className="check welcome-check">
         <input type="checkbox" checked={saved} onChange={(e) => setSaved(e.target.checked)} />

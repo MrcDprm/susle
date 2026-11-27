@@ -125,6 +125,16 @@ const tr = {
     body: 'Yılbaşı ağacındaki mesajlar açıldı, okumak için:',
     short: 'Hatırlatıcı kur',
   },
+  inApp: {
+    notice: (app: string) =>
+      app ? `Sayfayı ${app} içinden açtın. Hatırlatıcı kurmak için tarayıcıda aç.` : 'Sayfayı bir uygulamanın içinden açtın. Hatırlatıcı kurmak için tarayıcıda aç.',
+    openSafari: 'Safari’de aç',
+    openBrowser: 'Tarayıcıda aç',
+    copy: 'Linki kopyala',
+    copied: 'Kopyalandı',
+    hint: 'Açılmazsa sağ üstteki üç noktaya dokunup tarayıcıda aç seçeneğini seç.',
+    remind: 'Tarayıcıda aç ve hatırlatıcı kur',
+  },
   live: {
     one: 'Yeni bir süs asıldı.',
     many: (n: number) => `${n} yeni süs asıldı.`,
@@ -288,6 +298,16 @@ const en: Dict = {
     title: (name: string) => `${name}: messages are open`,
     body: 'The messages on the New Year tree are open. Read them here:',
     short: 'Set a reminder',
+  },
+  inApp: {
+    notice: (app: string) =>
+      app ? `You opened this inside ${app}. Open it in your browser to set a reminder.` : 'You opened this inside an app. Open it in your browser to set a reminder.',
+    openSafari: 'Open in Safari',
+    openBrowser: 'Open in browser',
+    copy: 'Copy link',
+    copied: 'Copied',
+    hint: 'If nothing happens, tap the three dots at the top right and choose to open in your browser.',
+    remind: 'Open in browser to set a reminder',
   },
   live: {
     one: 'A new ornament was just hung.',

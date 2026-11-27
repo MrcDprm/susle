@@ -1251,3 +1251,21 @@ textarea:focus-visible {
 .celebrate-body .btn {
   width: 100%;
 }
+
+/* Uygulama içi tarayıcı uyarısı */
+.in-app {
+  padding: 12px;
+  border-radius: 12px;
+  background: #fff6dc;
+  margin: 4px 0 14px;
+}
+
+.in-app-text {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.in-app .share-row {
+  margin: 8px 0 6px;
+}

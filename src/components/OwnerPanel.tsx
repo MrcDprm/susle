@@ -50,7 +50,7 @@ export function OwnerPanel({ lang, treeId, name, accepting, revealed, shareUrl, 
       </h2>
 
       <ShareTools lang={lang} treeId={treeId} shareUrl={shareUrl} />
-      {!revealed && <Reminder lang={lang} treeId={treeId} treeName={name} revealAt={revealAt} shareUrl={shareUrl} />}
+      {!revealed && <Reminder lang={lang} treeId={treeId} treeName={name} revealAt={revealAt} shareUrl={shareUrl} ownerUrl={ownerUrl} />}
 
       {!revealed && (
         <label className="check">

@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { deleteOrnamentAction } from '@/app/actions'
 import { dict, localePath, type Lang } from '@/lib/i18n'
+import { openInBrowserUrl } from '@/lib/inapp'
 import { chime } from '@/lib/music'
 import type { OrnamentView } from '@/lib/trees'
 import { OrnamentIcon } from './Art'
 import { Countdown } from './Countdown'
 import { Dialog } from './Dialog'
 import { HangForm } from './HangForm'
+import { useInApp } from './OpenInBrowser'
 import { OwnerPanel } from './OwnerPanel'
 import { Ground } from './scene/Ground'
 import { puffAt } from './scene/Snow'
@@ -48,6 +50,7 @@ export function TreeScreen(p: ScreenProps) {
   const [pending, start] = useTransition()
   const stage = useRef<HTMLElement>(null)
   const [welcomeOpen, setWelcomeOpen] = useState(p.welcome)
+  const inApp = useInApp()
   const [celebrate, setCelebrate] = useState(false)
   const known = useRef(p.total)
   known.current = Math.max(known.current, p.total)
@@ -147,11 +150,15 @@ export function TreeScreen(p: ScreenProps) {
           ) : (
             <>
               <Countdown lang={p.lang} revealAt={p.tree.revealAt} nowMs={p.nowMs} />
-              <a className="remind-link" href={`/api/takvim/${p.tree.id}?l=${p.lang}`} download="susle-1-ocak.ics">
+              <a
+                className="remind-link"
+                href={inApp ? openInBrowserUrl(p.ownerUrl ?? `${window.location.origin}${localePath(p.lang, `/a/${p.tree.id}`)}`, inApp.platform) : `/api/takvim/${p.tree.id}?l=${p.lang}`}
+                download={inApp ? undefined : 'susle-1-ocak.ics'}
+              >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6zm-2 15a2 2 0 0 0 4 0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                 </svg>
-                {t.reminder.short}
+                {inApp ? t.inApp.remind : t.reminder.short}
               </a>
             </>
           )}
