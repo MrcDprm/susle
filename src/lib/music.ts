@@ -54,8 +54,29 @@ function audio(): AudioContext {
     master = ctx.createGain()
     master.gain.value = 0.16
     master.connect(ctx.destination)
+    // Telefon tarayıcıları klavye açılınca, bildirim gelince ya da sekme arkaya düşünce
+    // sesi askıya alabiliyor. Müzik açıksa bir sonraki dokunuşta kaldığı yerden sürer.
+    ctx.addEventListener('statechange', () => {
+      if (playing && ctx?.state !== 'running') resumeOnNextGesture()
+    })
+    document.addEventListener('visibilitychange', () => {
+      if (playing && !document.hidden && ctx?.state !== 'running') void ctx?.resume()
+    })
   }
   return ctx
+}
+
+let waitingForGesture = false
+
+function resumeOnNextGesture() {
+  if (waitingForGesture) return
+  waitingForGesture = true
+  const resume = () => {
+    waitingForGesture = false
+    for (const type of ['pointerdown', 'keydown', 'touchend'] as const) window.removeEventListener(type, resume, true)
+    if (playing) void ctx?.resume()
+  }
+  for (const type of ['pointerdown', 'keydown', 'touchend'] as const) window.addEventListener(type, resume, true)
 }
 
 // Çan sesi: temel ton ve iki üst ton, hızla sönümlenir.
