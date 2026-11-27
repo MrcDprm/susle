@@ -88,7 +88,7 @@ const tr = {
   owner: {
     title: 'Bu ağaç senin',
     open: 'Paylaş',
-    shareMenu: 'Paylaş menüsü',
+    shareMenu: 'Paylaş',
     copyLink: 'Linki kopyala',
     copied: 'Kopyalandı',
     whatsapp: 'WhatsApp',
@@ -262,7 +262,7 @@ const en: Dict = {
   owner: {
     title: 'This tree is yours',
     open: 'Share',
-    shareMenu: 'Share menu',
+    shareMenu: 'Share',
     copyLink: 'Copy link',
     copied: 'Copied',
     whatsapp: 'WhatsApp',

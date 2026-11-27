@@ -17,7 +17,12 @@ export function Dialog({ open, onClose, label, children, className, dismissable 
   useEffect(() => {
     const d = ref.current
     if (!d) return
-    if (open && !d.open) d.showModal()
+    if (open && !d.open) {
+      d.showModal()
+      // Tarayıcı ilk alana odaklanıp onu kaydırmasın; odak pencerenin kendisinde başlar.
+      d.focus({ preventScroll: true })
+      d.scrollTop = 0
+    }
     if (!open && d.open) d.close()
   }, [open])
 
@@ -26,6 +31,7 @@ export function Dialog({ open, onClose, label, children, className, dismissable 
       ref={ref}
       className={`dialog ${className ?? ''}`}
       aria-label={label}
+      tabIndex={-1}
       onCancel={(e) => {
         if (!dismissable) e.preventDefault()
       }}
