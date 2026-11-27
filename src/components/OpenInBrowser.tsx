@@ -17,7 +17,7 @@ export function OpenInBrowser({ lang, inApp, compact, url }: { lang: Lang; inApp
   const t = dict(lang).inApp
   const [copied, setCopied] = useState(false)
   const pageUrl = url ?? window.location.href.replace(/[?&]yeni=1/, '')
-  const target = openInBrowserUrl(pageUrl, inApp.platform)
+  const target = openInBrowserUrl(pageUrl, inApp)
 
   const copy = async () => {
     try {
