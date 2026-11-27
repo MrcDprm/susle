@@ -1047,20 +1047,11 @@ textarea:focus-visible {
   margin-top: 10px;
 }
 
-.owner .share-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: -6px 0 18px;
-}
 
-.owner .story {
-  margin-bottom: 18px;
-}
 
-.owner .story .share-row {
-  margin: 8px 0 6px;
-}
+
+
+
 
 .card {
   display: flex;
@@ -1188,9 +1179,7 @@ textarea:focus-visible {
   margin-bottom: 10px;
 }
 
-.reminder.is-compact .share-row {
-  margin: 4px 0 14px;
-}
+
 
 .welcome-lead {
   margin: -6px 0 16px;
@@ -1266,6 +1255,68 @@ textarea:focus-visible {
   font-weight: 500;
 }
 
-.in-app .share-row {
-  margin: 8px 0 6px;
+
+
+/* Paylaşım araçları: her ekranda eşit genişlikte düğmeler, okunur linkler */
+.dialog:focus {
+  outline: none;
+}
+
+.share-tools,
+.story,
+.reminder {
+  margin-bottom: 18px;
+}
+
+.story .field-label,
+.reminder .field-label {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.share-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.share-row > .btn-small {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.share-row > .hint {
+  grid-column: 1 / -1;
+  align-self: center;
+}
+
+.copy-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 12px;
+  margin-top: 6px;
+  border-radius: 12px;
+  background: #f1f5fb;
+  border: 1px solid var(--cizgi);
+}
+
+.copy-value {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--koyu);
+  overflow-wrap: anywhere;
+  user-select: all;
+  -webkit-user-select: all;
+}
+
+.copy-btn {
+  flex: none;
 }

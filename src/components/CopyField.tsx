@@ -2,6 +2,8 @@
 
 import { useRef, useState } from 'react'
 
+// Link giriş alanında değil okunur bir kutuda durur: dar ekranda iki satıra bölünür, kaymaz.
+// Ekranda başındaki https:// gösterilmez, kopyalanan link tamdır.
 export function CopyField({ label, hint, value, copyLabel, copiedLabel, onCopied }: {
   label: string
   hint?: string
@@ -11,7 +13,18 @@ export function CopyField({ label, hint, value, copyLabel, copiedLabel, onCopied
   onCopied?: () => void
 }) {
   const [copied, setCopied] = useState(false)
-  const input = useRef<HTMLInputElement>(null)
+  const text = useRef<HTMLSpanElement>(null)
+
+  const selectText = () => {
+    const el = text.current
+    const selection = window.getSelection()
+    if (!el || !selection) return
+    const range = document.createRange()
+    range.selectNodeContents(el)
+    selection.removeAllRanges()
+    selection.addRange(range)
+  }
+
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(value)
@@ -20,21 +33,21 @@ export function CopyField({ label, hint, value, copyLabel, copiedLabel, onCopied
       setTimeout(() => setCopied(false), 2000)
     } catch {
       // Pano izni yoksa link seçili hale gelir; kullanıcı elle kopyalayabilir.
-      input.current?.focus()
-      input.current?.select()
+      selectText()
     }
   }
+
   return (
     <div className="copy-field">
-      <label>
-        <span className="field-label">{label}</span>
-        <span className="copy-row">
-          <input ref={input} readOnly value={value} onClick={(e) => e.currentTarget.select()} />
-          <button type="button" className="btn-small" onClick={copy}>
-            {copied ? copiedLabel : copyLabel}
-          </button>
+      <span className="field-label">{label}</span>
+      <div className="copy-box">
+        <span ref={text} className="copy-value" onClick={selectText}>
+          {value.replace(/^https?:\/\//, '')}
         </span>
-      </label>
+        <button type="button" className="btn-small copy-btn" onClick={copy}>
+          {copied ? copiedLabel : copyLabel}
+        </button>
+      </div>
       {hint && <p className="hint">{hint}</p>}
     </div>
   )
