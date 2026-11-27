@@ -23,13 +23,24 @@ export function detectInApp(ua: string): InApp | null {
   return null
 }
 
-// Sayfayı gerçek tarayıcıda açan adres. Android'de intent adresi varsayılan tarayıcıyı açar,
-// iPhone'da x-safari-https iOS 17 ve sonrasında Safari'yi açar.
-export function openInBrowserUrl(href: string, platform: InApp['platform']): string {
+// Sayfayı gerçek tarayıcıda açan adres.
+// Instagram iPhone: uygulamanın kendi extbrowser adresi; Instagram onay sorar, sonra Safari açılır.
+// Instagram x-safari-https adresini sessizce yutuyor.
+// Diğer iPhone uygulamaları: x-safari-https, iOS 17 ve sonrasında Safari'yi açar.
+// Android: intent adresi varsayılan tarayıcıyı açar.
+export function openInBrowserUrl(href: string, inApp: InApp): string {
   const url = new URL(href)
-  if (platform === 'android') {
+  if (inApp.platform === 'android') {
     return `intent://${url.host}${url.pathname}${url.search}#Intent;scheme=https;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(url.href)};end`
   }
-  if (platform === 'ios') return `x-safari-${url.href}`
+  if (inApp.platform === 'ios' && inApp.app === 'Instagram') return `instagram://extbrowser/?url=${encodeURIComponent(url.href)}`
+  if (inApp.platform === 'ios') return `x-safari-${url.href}`
   return url.href
+}
+
+// Kendiliğinden geçiş denenecek durumlar: denenmiş yollar. Adı bilinmeyen iPhone uygulamalarında
+// sayfa yerinde kalır, düğme ve tarif görünür.
+export function canAutoEscape(inApp: InApp): boolean {
+  if (inApp.platform === 'android') return true
+  return inApp.platform === 'ios' && (inApp.app === 'Instagram' || inApp.app === 'Facebook')
 }

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Rubik } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { Footer } from '@/components/Footer'
+import { InAppEscape } from '@/components/InAppEscape'
 import { Sky } from '@/components/scene/Sky'
 import { dict, isLang, LANGS, localePath } from '@/lib/i18n'
 import { siteUrl } from '@/lib/server'
@@ -47,6 +48,7 @@ export default async function LangLayout({ children, params }: { children: React
     <html lang={lang} className={rubik.variable}>
       <body>
         <Sky />
+        <InAppEscape />
         {children}
         <Footer />
       </body>

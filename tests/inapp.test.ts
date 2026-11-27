@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { detectInApp, openInBrowserUrl } from '@/lib/inapp'
+import { canAutoEscape, detectInApp, openInBrowserUrl } from '@/lib/inapp'
 
 const UA = {
   instagramIos:
@@ -37,10 +37,22 @@ describe('uygulama içi tarayıcı', () => {
 
   it('platforma göre tarayıcıda açma adresi üretir', () => {
     const href = 'https://susle.miracdeprem.com/a/abcdefgh23?dal=2'
-    expect(openInBrowserUrl(href, 'ios')).toBe('x-safari-https://susle.miracdeprem.com/a/abcdefgh23?dal=2')
-    const android = openInBrowserUrl(href, 'android')
+    expect(openInBrowserUrl(href, { app: 'Instagram', platform: 'ios' })).toBe(
+      `instagram://extbrowser/?url=${encodeURIComponent(href)}`,
+    )
+    expect(openInBrowserUrl(href, { app: 'Facebook', platform: 'ios' })).toBe('x-safari-https://susle.miracdeprem.com/a/abcdefgh23?dal=2')
+    expect(openInBrowserUrl(href, { app: '', platform: 'ios' })).toBe('x-safari-https://susle.miracdeprem.com/a/abcdefgh23?dal=2')
+    const android = openInBrowserUrl(href, { app: 'Instagram', platform: 'android' })
     expect(android.startsWith('intent://susle.miracdeprem.com/a/abcdefgh23?dal=2#Intent;scheme=https;')).toBe(true)
     expect(android).toContain(`S.browser_fallback_url=${encodeURIComponent(href)}`)
-    expect(openInBrowserUrl(href, 'other')).toBe(href)
+    expect(openInBrowserUrl(href, { app: 'LINE', platform: 'other' })).toBe(href)
+  })
+
+  it('yalnızca denenmiş yollarda kendiliğinden geçiş dener', () => {
+    expect(canAutoEscape({ app: 'Instagram', platform: 'ios' })).toBe(true)
+    expect(canAutoEscape({ app: 'Facebook', platform: 'ios' })).toBe(true)
+    expect(canAutoEscape({ app: '', platform: 'android' })).toBe(true)
+    expect(canAutoEscape({ app: 'TikTok', platform: 'ios' })).toBe(false)
+    expect(canAutoEscape({ app: '', platform: 'ios' })).toBe(false)
   })
 })

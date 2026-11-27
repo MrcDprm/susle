@@ -152,7 +152,7 @@ export function TreeScreen(p: ScreenProps) {
               <Countdown lang={p.lang} revealAt={p.tree.revealAt} nowMs={p.nowMs} />
               <a
                 className="remind-link"
-                href={inApp ? openInBrowserUrl(p.ownerUrl ?? `${window.location.origin}${localePath(p.lang, `/a/${p.tree.id}`)}`, inApp.platform) : `/api/takvim/${p.tree.id}?l=${p.lang}`}
+                href={inApp ? openInBrowserUrl(p.ownerUrl ?? `${window.location.origin}${localePath(p.lang, `/a/${p.tree.id}`)}`, inApp) : `/api/takvim/${p.tree.id}?l=${p.lang}`}
                 download={inApp ? undefined : 'susle-1-ocak.ics'}
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
