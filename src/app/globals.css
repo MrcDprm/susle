@@ -106,8 +106,9 @@ h2 {
 
 .moon {
   position: absolute;
-  top: max(31svh, 210px);
-  right: 7vw;
+  /* Başlık ve açıklamanın altında, ağacın yanında kalsın; yazının üstüne binmesin. */
+  top: max(41svh, 300px);
+  right: 6vw;
   width: 46px;
   height: 46px;
   border-radius: 50%;
