@@ -4,6 +4,7 @@ out/
 build/
 coverage/
 .vercel/
+.pglite/
 .env
 .env*.local
 *.log

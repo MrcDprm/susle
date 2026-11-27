@@ -25,6 +25,14 @@ Bugün 27 Kasım. İnsanların linki Aralık başında paylaşabilmesi için hed
 9. **İki dil:** Türkçe varsayılan, İngilizce `/en`.
 10. **Kalıcılık:** Ağaç silinmez. Açılıştan sonra okunur durumda kalır.
 
+## Sonradan eklenenler, 27 Kasım
+
+- Ağaç açılınca kapanmayan paylaşım penceresi: paylaş menüsü, WhatsApp, X, hikaye, sahip linki, hatırlatıcı. Sahip linki kaydedilmeden kapanmaz.
+- Altı ağaç: çam, karlı çam, göknar, ladin, gümüş, beyaz; sarkık dal uçları, katlarda renk geçişi ve yan gölge.
+- Canlı ağaç: 20 saniyede bir süs sayısına bakılır, yeni süs dalına iner.
+- 1 Ocak hatırlatıcısı: alarmlı takvim dosyası ve Google Takvim linki. Web bildirimi yerine bu seçildi; Vercel'in ücretsiz zamanlanmış görevi dakikasında çalışmıyor, iPhone'da web bildirimi ana ekrana eklenmeyi gerektiriyor.
+- Gece yarısı kutlaması.
+
 ## Teknoloji
 
 | Parça | Seçim | Neden |
@@ -62,7 +70,11 @@ Bugün 27 Kasım. İnsanların linki Aralık başında paylaşabilmesi için hed
 
 ## Tasarım
 
-Kendi kimliği olacak; portfolyonun gece İstanbul'u ve Norma'nın havuzu tekrarlanmaz. Yön: **keçe**. Ağaç ve süsler keçe kumaştan kesilmiş gibi, kenarlarında el dikişi var. Süs asılınca dalda sallanır; açılışta süsler sırayla parlar. Renk ve yazı tipi planı, ekran taslağıyla birlikte kod öncesi onaya gelir.
+Telefon önce düşünülür: ağaç sayfası tek ekranlık bir kış gecesi sahnesidir. Lacivert gökyüzü, yanıp sönen yıldızlar, ay, ara sıra kayan bir yıldız, ekran boyunca yağan kar. Altta karlı tepeler, ışığı yanan evler, bacadan tüten duman ve arada yürüyen bir kedi. Ağaçta yanıp sönen ampul dizileri, parlayan yıldız, hafifçe sallanan süsler; süs sayısı arttıkça ağacın altındaki hediyeler çoğalır. Ağaca dokununca ağaç sallanır, dallardan kar silkelenir.
+
+Ses: müzik kutusu tınısında Jingle Bells, Web Audio ile kodda üretilir, ses dosyası yok. Tarayıcılar sesin kendiliğinden başlamasına izin vermediği için ilk dokunuşla başlar; üstte açma kapama düğmesi var, tercih tarayıcıda saklanır. Süse dokununca ve süs asılınca kısa çan sesi.
+
+Yazı tipi tek aile, Rubik; Türkçe harfler diğer harflerle aynı tasarımda. Hareketi azaltma tercihi olanlarda bütün animasyonlar ve kar kapanır.
 
 ## Parçalar
 
