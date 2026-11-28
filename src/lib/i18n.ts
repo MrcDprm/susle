@@ -15,17 +15,17 @@ const tr = {
   htmlLang: 'tr',
   otherLang: 'English',
   meta: {
-    title: 'Süsle: arkadaşlarının süslediği yılbaşı ağacı',
+    title: 'Süsle: sevdiklerinin süslediği yılbaşı ağacı',
     description:
-      'Yılbaşı ağacını aç, linkini paylaş. Arkadaşların ağacına süs asıp mesaj bırakır, mesajlar 1 Ocak gece yarısı açılır. Ücretsiz, üyelik gerekmez.',
+      'Yılbaşı ağacını aç, linkini paylaş. Sevdiklerin ağacına süs asıp mesaj bırakır, mesajlar 1 Ocak gece yarısı açılır. Ücretsiz, üyelik gerekmez.',
     treeDescription: 'Bu ağaca bir süs as, mesajın 1 Ocak gece yarısı açılsın.',
   },
   home: {
-    title: 'Ağacını aç, arkadaşların süslesin.',
+    title: 'Ağacını aç, sevdiklerin süslesin.',
     lead: 'Linkini paylaş. Her süsün arkasında bir mesaj var ve hepsi 1 Ocak gece yarısına kadar kilitli kalıyor.',
     steps: [
-      'Ağacını aç ve linkini arkadaşlarına gönder.',
-      'Arkadaşların bir süs seçip mesaj bırakır.',
+      'Ağacını aç ve linkini sevdiklerine gönder.',
+      'Sevdiklerin bir süs seçip mesaj bırakır.',
       '1 Ocak 00:00 olunca mesajlar açılır, ağaç anı olarak kalır.',
     ],
     yourTrees: 'Ağaçların',
@@ -41,7 +41,7 @@ const tr = {
     nameError: 'Ağacına 1 ile 40 karakter arasında bir ad ver.',
     ready: 'Ağacın hazır.',
     shareLabel: 'Paylaşım linki',
-    shareHint: 'Bunu arkadaşlarına gönder.',
+    shareHint: 'Bunu sevdiklerine gönder.',
     ownerLabel: 'Sahip linkin',
     ownerHint:
       'Bu link ağacının anahtarı. Kimseyle paylaşma, bir yere kaydet. Başka bir telefondan ya da tarayıcıdan ağacını yönetmenin tek yolu bu.',
@@ -109,7 +109,7 @@ const tr = {
   },
   welcome: {
     title: 'Ağacın hazır.',
-    lead: 'Şimdi arkadaşlarına gönder, süsler gelmeye başlasın. Kapatmadan önce sahip linkini kaydet.',
+    lead: 'Şimdi sevdiklerine gönder, süsler gelmeye başlasın. Kapatmadan önce sahip linkini kaydet.',
     share: 'Linkini paylaş',
     save: 'Sahip linkini kaydet',
     remind: '1 Ocak gece yarısı için hatırlatıcı kur',
@@ -179,7 +179,7 @@ const tr = {
     invite: 'Ağacıma bir dilek as, 1 Ocak gece yarısı açılsın.',
     count: (n: number) => (n === 0 ? 'İlk süsü sen as.' : `Şimdiden ${n} süs asıldı.`),
     revealed: (n: number, year: number) => `${year} yılına ${n} dileği okuyarak girdim.`,
-    promo: 'Sen de ağacını aç, linkini arkadaşlarınla paylaş. Yeni yıla dileklerini okuyarak gir.',
+    promo: 'Sen de ağacını aç, linkini sevdiklerinle paylaş. Yeni yıla dileklerini okuyarak gir.',
   },
 }
 
@@ -189,16 +189,16 @@ const en: Dict = {
   htmlLang: 'en',
   otherLang: 'Türkçe',
   meta: {
-    title: 'Süsle: a New Year tree your friends decorate',
+    title: 'Süsle: a New Year tree your loved ones decorate',
     description:
-      'Open your New Year tree and share the link. Friends hang ornaments with messages, and every message opens at midnight on 1 January. Free, no sign-up.',
+      'Open your New Year tree and share the link. Your loved ones hang ornaments with messages, and every message opens at midnight on 1 January. Free, no sign-up.',
     treeDescription: 'Hang an ornament on this tree. Your message opens at midnight on 1 January.',
   },
   home: {
-    title: 'Open your tree, let your friends decorate it.',
+    title: 'Open your tree, let your loved ones decorate it.',
     lead: 'Share your link. Every ornament carries a message, and all of them stay sealed until midnight on 1 January.',
     steps: [
-      'Open your tree and send the link to your friends.',
+      'Open your tree and send the link to the people you love.',
       'They pick an ornament and leave a message.',
       'At 00:00 on 1 January the messages open, and the tree stays as a keepsake.',
     ],
@@ -215,7 +215,7 @@ const en: Dict = {
     nameError: 'Give your tree a name between 1 and 40 characters.',
     ready: 'Your tree is ready.',
     shareLabel: 'Share link',
-    shareHint: 'Send this one to your friends.',
+    shareHint: 'Send this one to the people you love.',
     ownerLabel: 'Your owner link',
     ownerHint:
       'This link is the key to your tree. Do not share it, save it somewhere. It is the only way to manage your tree from another phone or browser.',
@@ -283,7 +283,7 @@ const en: Dict = {
   },
   welcome: {
     title: 'Your tree is ready.',
-    lead: 'Send it to your friends so the ornaments start coming in. Save your owner link before you close this.',
+    lead: 'Send it to the people you love so the ornaments start coming in. Save your owner link before you close this.',
     share: 'Share your link',
     save: 'Save your owner link',
     remind: 'Set a reminder for midnight on 1 January',
@@ -353,7 +353,7 @@ const en: Dict = {
     invite: 'Hang a wish on my tree. It opens at midnight on 1 January.',
     count: (n: number) => (n === 0 ? 'Be the first to hang one.' : n === 1 ? '1 ornament so far.' : `${n} ornaments so far.`),
     revealed: (n: number, year: number) => (n === 1 ? `I welcomed ${year} reading 1 wish.` : `I welcomed ${year} reading ${n} wishes.`),
-    promo: 'Open your own tree and share the link with your friends. Start the new year reading their wishes.',
+    promo: 'Open your own tree and share the link with the people you love. Start the new year reading their wishes.',
   },
 }
 

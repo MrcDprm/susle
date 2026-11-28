@@ -2,7 +2,7 @@ English | [Türkçe](README.tr.md)
 
 # Süsle
 
-Open your own New Year tree and share the link. Friends hang ornaments with a message on it, and every message stays sealed until midnight on 1 January, Türkiye time. The tree stays online afterwards as a keepsake.
+Open your own New Year tree and share the link. The people you love hang ornaments with a message on it, and every message stays sealed until midnight on 1 January, Türkiye time. The tree stays online afterwards as a keepsake.
 
 Live: https://susle.miracdeprem.com
 
