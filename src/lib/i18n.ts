@@ -176,6 +176,7 @@ const tr = {
     askSave: 'Kaydet ve çık',
     askDiscard: 'Kaydetmeden çık',
     askBack: 'Düzenlemeye dön',
+    invalid: 'Notun en fazla 80 karakter olabilir.',
     groups: {
       style: 'Ağaç',
       topper: 'Tepe süsü',
@@ -478,6 +479,7 @@ const en: Dict = {
     askSave: 'Save and close',
     askDiscard: 'Close without saving',
     askBack: 'Keep editing',
+    invalid: 'Your note can be at most 80 characters.',
     groups: {
       style: 'Tree',
       topper: 'Topper',

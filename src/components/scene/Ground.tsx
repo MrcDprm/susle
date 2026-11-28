@@ -103,66 +103,100 @@ function ForestFar() {
   )
 }
 
+// Şehir: bakan kişi nehre doğru bakar. Nehir ufka uzanır; sol kıyıda ormanlık bir tepe, sağ kıyıda şehir var.
+// Asma köprü iki kıyıyı bağlar: kuleleri sudaki ayaklara oturur, ışıkları suya yansır.
+// Nehir karlı tepenin arkasında kalmasın diye şehir manzarası diğerlerinden biraz yukarıda.
+const DECK = 124
+const RIVER_TOP = 100
+
+function cableY(x: number): number {
+  if (x < 150) return DECK - 4 - ((x - 34) / 116) * (DECK - 4 - 78)
+  if (x > 330) return 78 + ((x - 330) / 132) * (DECK - 4 - 78)
+  return 78 + 30 * (1 - ((x - 240) / 90) ** 2)
+}
+
 function Bridge() {
-  // Asma köprü: iki kule arasında sarkan ana halat, yan açıklıklarda düz halat, halat boyunca ışıklar.
-  const deck = 150
-  const cable = (x: number) =>
-    x < 150 ? deck - 4 - ((x - 40) / 110) * (deck - 100) : x > 330 ? 96 + ((x - 330) / 110) * (deck - 100) : 96 + 34 * (1 - (((x - 240) / 90) ** 2))
   return (
     <g>
-      <path d={`M40 ${deck - 4} L150 96 Q240 164 330 96 L440 ${deck - 4}`} stroke="#8D9CC4" strokeWidth={1.4} fill="none" />
-      {Array.from({ length: 21 }, (_, i) => {
-        const x = 158 + i * 8
-        return <path key={i} d={`M${x} ${cable(x).toFixed(1)} L${x} ${deck}`} stroke="#6F7EA8" strokeWidth={0.5} />
-      })}
+      {/* Ayaklar ve kuleler */}
       {[150, 330].map((x) => (
         <g key={x}>
-          <rect x={x - 4} y={88} width={3} height={deck - 88} fill="#3A4778" />
-          <rect x={x + 1} y={88} width={3} height={deck - 88} fill="#3A4778" />
-          <rect x={x - 4} y={104} width={8} height={2} fill="#3A4778" />
-          <circle cx={x} cy={86} r={1.6} fill="#FF5A5A" className="beacon" />
+          <rect x={x - 7} y={DECK} width={14} height={14} fill="#2C3866" />
+          <rect x={x - 7} y={DECK + 12} width={14} height={2} fill="#B9C8E0" opacity={0.6} />
+          <rect x={x - 4} y={70} width={3} height={DECK - 70} fill="#3A4778" />
+          <rect x={x + 1} y={70} width={3} height={DECK - 70} fill="#3A4778" />
+          <rect x={x - 4} y={86} width={8} height={2} fill="#3A4778" />
+          <rect x={x - 4} y={106} width={8} height={2} fill="#3A4778" />
+          <circle cx={x} cy={68} r={1.6} fill="#FF5A5A" className="beacon" />
         </g>
       ))}
-      <rect x={20} y={deck} width={440} height={3.5} fill="#3A4778" />
-      {Array.from({ length: 25 }, (_, i) => {
-        const x = 44 + i * 16
-        return <circle key={i} cx={x} cy={cable(x).toFixed(1)} r={1.3} fill="#FFE7B0" className={i % 3 === 0 ? 'window w2' : 'window'} />
+      <path d={`M34 ${DECK - 4} L150 78 Q240 138 330 78 L462 ${DECK - 4}`} stroke="#8D9CC4" strokeWidth={1.4} fill="none" />
+      {Array.from({ length: 21 }, (_, i) => {
+        const x = 158 + i * 8
+        return <path key={i} d={`M${x} ${cableY(x).toFixed(1)} L${x} ${DECK}`} stroke="#6F7EA8" strokeWidth={0.5} />
+      })}
+      <rect x={24} y={DECK} width={446} height={3.5} fill="#3A4778" />
+      <rect x={24} y={DECK - 0.8} width={446} height={1} fill={SNOW} opacity={0.8} />
+      {Array.from({ length: 27 }, (_, i) => {
+        const x = 40 + i * 16
+        return <circle key={i} cx={x} cy={cableY(x).toFixed(1)} r={1.3} fill="#FFE7B0" className={i % 3 === 0 ? 'window w2' : 'window'} />
       })}
       {Array.from({ length: 28 }, (_, i) => (
-        <circle key={`d${i}`} cx={24 + i * 16} cy={deck + 1.7} r={0.9} fill={WARM} opacity={0.8} />
+        <circle key={`d${i}`} cx={28 + i * 16} cy={DECK + 1.7} r={0.9} fill={WARM} opacity={0.85} />
       ))}
+      {/* Köprü ışıklarının sudaki yansıması */}
+      <g className="shimmer">
+        {Array.from({ length: 14 }, (_, i) => {
+          const x = 44 + i * 30
+          return <rect key={i} x={x - 0.8} y={DECK + 6 + (i % 3) * 3} width={1.6} height={10 + (i % 4) * 4} rx={0.8} fill="#FFE7B0" opacity={0.3} />
+        })}
+      </g>
     </g>
   )
 }
 
 const FAR_CITY: [number, number, number][] = [
-  [0, 40, 52], [38, 30, 70], [66, 44, 46], [108, 26, 84], [132, 40, 58], [170, 34, 76], [202, 46, 50], [246, 30, 92],
-  [274, 42, 60], [314, 28, 72], [340, 46, 56], [384, 32, 88], [414, 40, 62], [452, 30, 80], [480, 44, 54], [522, 28, 96],
-  [548, 40, 64], [586, 34, 74], [618, 46, 58], [662, 30, 86], [690, 40, 60], [728, 32, 78], [758, 42, 56],
+  [470, 30, 70], [498, 40, 52], [534, 26, 92], [558, 40, 62], [612, 30, 80], [640, 44, 54], [682, 28, 96],
+  [708, 40, 64], [746, 30, 76], [774, 30, 58],
 ]
 
 function CityFar() {
   const r = seeded(41)
   return (
     <g>
+      {/* Ufuktaki tepeler ve uzak kıyının ışıkları */}
+      <path d={`M0 ${RIVER_TOP} Q120 82 260 92 T520 88 T800 90 L800 ${RIVER_TOP + 4} L0 ${RIVER_TOP + 4} Z`} fill="#26345F" />
+      {Array.from({ length: 46 }, (_, i) => (
+        <circle key={i} cx={(r() * 800).toFixed(1)} cy={(90 + r() * 10).toFixed(1)} r={0.8} fill={WARM} opacity={0.35 + r() * 0.45} />
+      ))}
+      {/* Nehir: ufka doğru daralır */}
+      <path d={`M300 ${RIVER_TOP + 2} L470 ${RIVER_TOP + 2} L560 220 L0 220 L0 142 Z`} fill="url(#seaDeep)" />
+      <path d="M330 108 L380 108 M250 134 L330 134 M120 160 L240 160 M360 150 L430 150 M60 184 L200 184" stroke="#5D78B0" strokeWidth={0.8} opacity={0.6} />
+      {/* Sol kıyı: karlı, çam ağaçlı tepe */}
+      <path d="M0 112 Q30 106 60 116 Q90 128 150 138 Q60 152 0 154 Z" fill="#2B3A66" />
+      <path d="M0 112 Q30 106 60 116 Q70 120 80 123 Q40 118 0 120 Z" fill={SNOW} opacity={0.85} />
+      <PineRow y={122} from={4} to={84} step={9} s={0.75} color="#1E3552" seed={44} />
+      {/* Sağ kıyı: rıhtım ve şehir */}
+      <path d={`M440 ${DECK + 4} L800 ${DECK - 2} L800 220 L500 220 Z`} fill="#1F2A4C" />
+      <path d={`M440 ${DECK + 4} L800 ${DECK - 2} L800 ${DECK + 1} L442 ${DECK + 6.5} Z`} fill={SNOW} opacity={0.9} />
       {FAR_CITY.map(([x, w, ht], i) => (
         <g key={i}>
-          <rect x={x} y={170 - ht} width={w} height={ht + 30} fill={i % 2 ? '#283463' : '#2D3A6C'} />
-          {i % 4 === 1 && <rect x={x + w / 2 - 1} y={170 - ht - 12} width={2} height={12} fill="#283463" />}
-          {i % 4 === 1 && <circle cx={x + w / 2} cy={170 - ht - 13} r={1.4} fill="#FF5A5A" className="beacon" />}
-          {i % 5 === 2 && <path d={`M${x} ${170 - ht} L${x + w / 2} ${170 - ht - 14} L${x + w} ${170 - ht} Z`} fill="#2D3A6C" />}
+          <rect x={x} y={DECK + 2 - ht} width={w} height={ht + 40} fill={i % 2 ? '#283463' : '#2D3A6C'} />
+          {i % 4 === 1 && <rect x={x + w / 2 - 1} y={DECK + 2 - ht - 12} width={2} height={12} fill="#283463" />}
+          {i % 4 === 1 && <circle cx={x + w / 2} cy={DECK + 2 - ht - 13} r={1.4} fill="#FF5A5A" className="beacon" />}
+          {i % 5 === 2 && <path d={`M${x} ${DECK + 2 - ht} L${x + w / 2} ${DECK + 2 - ht - 14} L${x + w} ${DECK + 2 - ht} Z`} fill="#2D3A6C" />}
           {Array.from({ length: Math.floor(ht / 7) }, (_, row) =>
             Array.from({ length: Math.floor(w / 7) }, (_, c) =>
-              r() < 0.42 ? (
-                <rect key={`${row}-${c}`} x={x + 2.5 + c * 7} y={170 - ht + 4 + row * 7} width={3} height={3} fill={WARM} opacity={0.35 + r() * 0.5} className={r() < 0.08 ? 'window w2' : undefined} />
+              r() < 0.45 ? (
+                <rect key={`${row}-${c}`} x={x + 2.5 + c * 7} y={DECK + 2 - ht + 4 + row * 7} width={3} height={3} fill={WARM} opacity={0.35 + r() * 0.5} className={r() < 0.08 ? 'window w2' : undefined} />
               ) : null,
             ),
           )}
-          <rect x={x} y={170 - ht} width={w} height={2} fill={SNOW} opacity={0.8} />
+          <rect x={x} y={DECK + 2 - ht} width={w} height={2} fill={SNOW} opacity={0.8} />
         </g>
       ))}
       {/* Saat kulesi, kadranı on ikiyi gösterir. */}
-      <g transform="translate(600 170)">
+      <g transform={`translate(596 ${DECK + 2}) scale(0.82)`}>
         <rect x={-14} y={-118} width={28} height={118} fill="#323F74" />
         <path d="M-17 -118 L0 -146 L17 -118 Z" fill="#323F74" />
         <path d="M-17 -118 L0 -146 L17 -118 L13 -118 L0 -140 L-13 -118 Z" fill={SNOW} />
