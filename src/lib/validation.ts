@@ -3,7 +3,7 @@ import { TREE_ID_PATTERN } from './ids'
 import { lookSchema } from './look'
 
 export const ORNAMENT_KINDS = 20
-export const TREE_STYLES = 6
+export const TREE_STYLES = 9
 export const MAX_BODY = 500
 export const MAX_NAME = 30
 export const MAX_TREE_NAME = 40
@@ -28,6 +28,14 @@ function length(value: string): number {
 export const langSchema = z.enum(['tr', 'en'])
 export const treeIdSchema = z.string().regex(TREE_ID_PATTERN)
 
+// Ağacın altındaki kısa not; boşsa saklanmaz.
+const noteSchema = z
+  .string()
+  .max(400)
+  .transform(oneLine)
+  .refine((v) => length(v) <= MAX_NOTE, 'long')
+  .transform((v) => (v === '' ? null : v))
+
 export const createTreeSchema = z.object({
   name: z
     .string()
@@ -37,6 +45,9 @@ export const createTreeSchema = z.object({
     .refine((v) => length(v) <= MAX_TREE_NAME, 'long'),
   style: z.number().int().min(0).max(TREE_STYLES - 1),
   lang: langSchema,
+  // Ağaç açılırken süsleme adımında seçilenler; gönderilmezse varsayılan görünüm.
+  look: lookSchema.optional(),
+  note: noteSchema.optional(),
 })
 
 export const hangOrnamentSchema = z.object({
@@ -66,16 +77,11 @@ export const hangOrnamentSchema = z.object({
   token: z.string().min(1).max(2048),
 })
 
-// Ağacını süsle ekranından gelen görünüm; not boşsa saklanmaz.
+// Ağacını süsle ekranından gelen görünüm.
 export const customizeSchema = z.object({
   style: z.number().int().min(0).max(TREE_STYLES - 1),
   look: lookSchema,
-  note: z
-    .string()
-    .max(400)
-    .transform(oneLine)
-    .refine((v) => length(v) <= MAX_NOTE, 'long')
-    .transform((v) => (v === '' ? null : v)),
+  note: noteSchema,
 })
 
 export type CreateTreeInput = z.input<typeof createTreeSchema>

@@ -1,101 +1,75 @@
-// Müzik kutusu: üç yılbaşı ezgisi, Web Audio ile çan tınısında çalınır. Ağacın sahibi birini seçer.
-// Üçü de kamu malı: Jingle Bells 1857, We Wish You a Merry Christmas ve Deck the Halls geleneksel.
-// Ses dosyası yok, notalar kodda üretilir.
-
-type Note = [midi: number | null, beats: number]
-
-type Song = {
-  bpm: number
-  beatsPerBar: number
-  // Ezgi ilk ölçüden önce başlıyorsa önden gelen vuruş sayısı.
-  pickup: number
-  melody: Note[]
-  // Her ölçünün kök notası; null o ölçüde eşlik yok demektir.
-  bass: (number | null)[]
-}
-
-const E = 76, F = 77, G = 79, C5 = 72, D = 74, A = 81, B = 83, C6 = 84, Fs = 78
-
-const SONGS: Song[] = [
-  {
-    bpm: 118,
-    beatsPerBar: 4,
-    pickup: 0,
-    melody: [
-      [E, 1], [E, 1], [E, 2], [E, 1], [E, 1], [E, 2], [E, 1], [G, 1], [C5, 1.5], [D, 0.5], [E, 4],
-      [F, 1], [F, 1], [F, 1.5], [F, 0.5], [F, 1], [E, 1], [E, 1], [E, 0.5], [E, 0.5], [E, 1], [D, 1], [D, 1], [E, 1], [D, 2], [G, 2],
-      [E, 1], [E, 1], [E, 2], [E, 1], [E, 1], [E, 2], [E, 1], [G, 1], [C5, 1.5], [D, 0.5], [E, 4],
-      [F, 1], [F, 1], [F, 1.5], [F, 0.5], [F, 1], [E, 1], [E, 1], [E, 0.5], [E, 0.5], [G, 1], [G, 1], [F, 1], [D, 1], [C5, 4],
-      [null, 4],
-    ],
-    bass: [48, 48, 48, 48, 53, 48, 50, 43, 48, 48, 48, 48, 53, 48, 43, 48, null],
-  },
-  {
-    // We Wish You a Merry Christmas, 3/4, sol majör.
-    bpm: 132,
-    beatsPerBar: 3,
-    pickup: 1,
-    melody: [
-      [D, 1],
-      [G, 1], [G, 0.5], [A, 0.5], [G, 0.5], [Fs, 0.5],
-      [E, 1], [E, 1], [E, 1],
-      [A, 1], [A, 0.5], [B, 0.5], [A, 0.5], [G, 0.5],
-      [Fs, 1], [D, 1], [D, 1],
-      [B, 1], [B, 0.5], [C6, 0.5], [B, 0.5], [A, 0.5],
-      [G, 1], [E, 1], [D, 0.5], [D, 0.5],
-      [E, 1], [A, 1], [Fs, 1],
-      [G, 3],
-      [null, 2],
-    ],
-    bass: [43, 48, 45, 50, 47, 52, 48, 43, null],
-  },
-  {
-    // Deck the Halls, 4/4, do majör.
-    bpm: 120,
-    beatsPerBar: 4,
-    pickup: 0,
-    melody: [
-      [G, 1.5], [F, 0.5], [E, 1], [D, 1], [C5, 1], [D, 1], [E, 1], [C5, 1],
-      [D, 0.5], [E, 0.5], [F, 0.5], [D, 0.5], [E, 1.5], [D, 0.5], [C5, 1], [71, 1], [C5, 2],
-      [G, 1.5], [F, 0.5], [E, 1], [D, 1], [C5, 1], [D, 1], [E, 1], [C5, 1],
-      [D, 0.5], [E, 0.5], [F, 0.5], [D, 0.5], [E, 1.5], [D, 0.5], [C5, 1], [71, 1], [C5, 2],
-      [D, 1.5], [E, 0.5], [F, 1], [D, 1], [E, 1.5], [F, 0.5], [G, 1], [D, 1],
-      [E, 0.5], [Fs, 0.5], [G, 1], [A, 0.5], [B, 0.5], [C6, 1], [B, 1], [A, 1], [G, 2],
-      [G, 1.5], [F, 0.5], [E, 1], [D, 1], [C5, 1], [D, 1], [E, 1], [C5, 1],
-      [A, 0.5], [A, 0.5], [A, 0.5], [A, 0.5], [G, 1.5], [F, 0.5], [E, 1], [D, 1], [C5, 2],
-      [null, 4],
-    ],
-    bass: [48, 48, 43, 48, 48, 48, 43, 48, 43, 43, 50, 43, 48, 48, 53, 48, null],
-  },
-]
-
-const PENTATONIC = [79, 81, 84, 86, 88, 91]
+// Müzik kutusu: şarkılar Web Audio ile çan tınısında çalınır. Ana ezginin altında bas, akor ve
+// arpej eşliği akorlardan üretilir. Ses dosyası yok, notalar songs.ts'te.
+import { parseBar, parseVoice, SONGS, type SongDef } from './songs'
 
 type Event = { at: number; midi: number; volume: number; length: number }
 
-// Bir döngünün bütün notaları, döngü başından saniye cinsinden.
-function eventsOf(song: Song): { events: Event[]; loop: number } {
-  const beat = 60 / song.bpm
-  const list: Event[] = []
-  let t = 0
-  for (const [midi, beats] of song.melody) {
-    if (midi !== null) list.push({ at: t * beat, midi, volume: 0.55, length: Math.min(1.6, beats * beat + 0.6) })
-    t += beats
-  }
-  song.bass.forEach((midi, bar) => {
-    if (midi === null) return
-    const start = song.pickup + bar * song.beatsPerBar
-    list.push({ at: start * beat, midi, volume: 0.22, length: 1.1 })
-    const offsets = song.beatsPerBar === 3 ? [1, 2] : [2]
-    for (const o of offsets) list.push({ at: (start + o) * beat, midi: midi + 7, volume: 0.16, length: 1 })
-  })
-  return { events: list.sort((x, y) => x.at - y.at), loop: t * beat }
+const PENTATONIC = [79, 81, 84, 86, 88, 91]
+
+// Akor notasını belli bir aralığa yerleştirir: bas 40-51, eşlik 55-66.
+function place(pc: number, low: number): number {
+  return low + ((pc - low) % 12 + 12) % 12
 }
 
-let current = eventsOf(SONGS[0])
+// Bir döngünün bütün notaları, döngü başından saniye cinsinden.
+export function eventsOf(song: SongDef): { events: Event[]; loop: number } {
+  const beat = 60 / song.bpm
+  const list: Event[] = []
+  let total = 0
+
+  song.voices.forEach((text, v) => {
+    let t = 0
+    for (const n of parseVoice(text)) {
+      if (n.midi !== null) {
+        const lead = v === 0
+        list.push({ at: t * beat, midi: n.midi, volume: lead ? 0.5 : 0.28, length: Math.min(1.8, n.beats * beat + 0.5) })
+        // Uzun ezgi notalarına bir oktav yukarıdan ince bir parıltı eklenir.
+        if (lead && n.beats >= 1.5) list.push({ at: t * beat + 0.02, midi: n.midi + 12, volume: 0.07, length: 1.2 })
+      }
+      t += n.beats
+    }
+    total = Math.max(total, t)
+  })
+
+  song.chords.forEach((spec, bar) => {
+    if (spec === null) return
+    const start = song.pickup + bar * song.beatsPerBar
+    for (const part of parseBar(spec, song.beatsPerBar)) {
+      const { chord } = part
+      const bass = place(chord.bass, 40)
+      const mid = chord.tones.slice(1).map((pc) => place(pc, 55))
+      const fifth = place(chord.tones[2] ?? chord.root, 52)
+      const at = (b: number) => (start + part.at + b) * beat
+      const step = song.feel === 'compound' ? 0.5 : 1
+      for (let b = 0; b < part.beats - 1e-9; b += step) {
+        const first = b === 0
+        if (song.feel === 'compound') {
+          // Altı sekizlik akış: bas, beşli, kök, üçlü, kök, beşli.
+          const k = Math.round((part.at + b) / 0.5) % 6
+          const arp = [bass, fifth, place(chord.root, 60), place(chord.tones[1], 64), place(chord.root, 60), fifth]
+          list.push({ at: at(b), midi: arp[k], volume: k === 0 ? 0.2 : 0.11, length: k === 0 ? 1.4 : 0.9 })
+        } else if (song.feel === 'waltz') {
+          if (first || (part.at + b) % song.beatsPerBar === 0) list.push({ at: at(b), midi: bass, volume: 0.2, length: 1.2 })
+          else for (const m of mid) list.push({ at: at(b), midi: m, volume: 0.08, length: 0.7 })
+        } else {
+          const beatInBar = Math.round(part.at + b) % song.beatsPerBar
+          if (beatInBar % 2 === 0) {
+            const note = first || beatInBar === 0 ? bass : place(chord.tones[2] ?? chord.root, 40)
+            list.push({ at: at(b), midi: note, volume: 0.2, length: 1.1 })
+          } else {
+            for (const m of mid) list.push({ at: at(b), midi: m, volume: 0.08, length: 0.7 })
+          }
+        }
+      }
+    }
+  })
+
+  const loop = Math.max(total, song.pickup + song.chords.length * song.beatsPerBar) * beat
+  return { events: list.sort((x, y) => x.at - y.at), loop }
+}
+
 let songIndex = 0
-let EVENTS = current.events
-let LOOP = current.loop
+let current = eventsOf(SONGS[0])
 
 let ctx: AudioContext | null = null
 let master: GainNode | null = null
@@ -140,17 +114,19 @@ function resumeOnNextGesture() {
 }
 
 // Çan sesi: temel ton ve iki üst ton, hızla sönümlenir.
-function bell(midi: number, at: number, volume: number, length = 1.4) {
+function bell(midi: number, at: number, volume: number, length = 1.4, dest?: AudioNode) {
   const ac = audio()
   const out = ac.createGain()
-  out.connect(master!)
+  out.connect(dest ?? master!)
   out.gain.setValueAtTime(0.0001, at)
   out.gain.exponentialRampToValueAtTime(volume, at + 0.008)
   out.gain.exponentialRampToValueAtTime(0.0001, at + length)
+  // Pes notalar daha yumuşak: üst tonlar azalır.
+  const bright = midi >= 60 ? 1 : 0.4
   for (const [ratio, level] of [
     [1, 1],
-    [2.01, 0.28],
-    [3.98, 0.08],
+    [2.01, 0.28 * bright],
+    [3.98, 0.08 * bright],
   ]) {
     const osc = ac.createOscillator()
     const g = ac.createGain()
@@ -166,15 +142,16 @@ function bell(midi: number, at: number, volume: number, length = 1.4) {
 // Yarım saniye ileriyi planlar; zamanlayıcı her çeyrek saniyede bir çağırır.
 function schedule() {
   const horizon = audio().currentTime + 0.5
+  const { events, loop } = current
   while (true) {
-    const e = EVENTS[cursor]
+    const e = events[cursor]
     const at = loopStart + e.at
     if (at >= horizon) break
     bell(e.midi, at, e.volume, e.length)
     cursor++
-    if (cursor === EVENTS.length) {
+    if (cursor === events.length) {
       cursor = 0
-      loopStart += LOOP
+      loopStart += loop
     }
   }
 }
@@ -185,12 +162,44 @@ export function setSong(index: number): void {
   if (next === songIndex) return
   songIndex = next
   current = eventsOf(SONGS[next])
-  EVENTS = current.events
-  LOOP = current.loop
   if (playing && ctx) {
     cursor = 0
     loopStart = ctx.currentTime + 0.1
   }
+}
+
+let preview: GainNode | null = null
+
+// Müzik kapalıyken şarkı seçilirse ilk birkaç saniyesi bir kez çalınır; açıksa şarkı değişir.
+export function previewSong(index: number): void {
+  if (playing) {
+    setSong(index)
+    return
+  }
+  stopPreview()
+  const ac = audio()
+  void ac.resume()
+  const out = ac.createGain()
+  out.gain.value = 0.16
+  out.connect(ac.destination)
+  preview = out
+  const { events } = eventsOf(SONGS[index] ?? SONGS[0])
+  const start = ac.currentTime + 0.08
+  for (const e of events) {
+    if (e.at > 7) break
+    bell(e.midi, start + e.at, e.volume, e.length, out)
+  }
+  out.gain.setValueAtTime(0.16, start + 6.5)
+  out.gain.linearRampToValueAtTime(0.0001, start + 8)
+}
+
+export function stopPreview(): void {
+  if (!preview || !ctx) return
+  const p = preview
+  preview = null
+  p.gain.cancelScheduledValues(ctx.currentTime)
+  p.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.08)
+  setTimeout(() => p.disconnect(), 600)
 }
 
 export function isPlaying(): boolean {
@@ -199,6 +208,7 @@ export function isPlaying(): boolean {
 
 export async function startMusic(): Promise<void> {
   if (playing) return
+  stopPreview()
   const ac = audio()
   await ac.resume()
   playing = true

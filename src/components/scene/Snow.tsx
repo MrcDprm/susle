@@ -28,15 +28,21 @@ export function Snow() {
     let flakes: Flake[] = []
     let raf = 0
     let last = performance.now()
+    let mode = '0'
 
-    const spawn = (top = false): Flake => ({
-      x: Math.random() * w,
-      y: top ? -10 : Math.random() * h,
-      r: 0.8 + Math.random() * 2.4,
-      vy: 18 + Math.random() * 30,
-      vx: -6 + Math.random() * 12,
-      phase: Math.random() * Math.PI * 2,
-    })
+    // Kar modları html data-snow ile gelir: 0 hafif, 1 yoğun, 2 yok, 3 tipi, 4 iri taneler.
+    const spawn = (top = false): Flake => {
+      const storm = mode === '3'
+      const big = mode === '4'
+      return {
+        x: storm && top ? -20 - Math.random() * w * 0.5 + Math.random() * w : Math.random() * w,
+        y: top ? -10 : Math.random() * h,
+        r: big ? 2.4 + Math.random() * 3 : 0.8 + Math.random() * (storm ? 1.8 : 2.4),
+        vy: storm ? 70 + Math.random() * 60 : big ? 14 + Math.random() * 14 : 18 + Math.random() * 30,
+        vx: storm ? 90 + Math.random() * 80 : -6 + Math.random() * 12,
+        phase: Math.random() * Math.PI * 2,
+      }
+    }
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -45,11 +51,13 @@ export function Snow() {
       canvas.width = Math.round(w * dpr)
       canvas.height = Math.round(h * dpr)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      // Kar yoğunluğu ağacın ayarından gelir: html data-snow 1 yoğun, 2 kar yok.
-      const mode = document.documentElement.dataset.snow
-      const factor = mode === '1' ? 2.2 : mode === '2' ? 0 : 1
-      const target = Math.min(300, Math.round(((w * h) / 7000) * factor))
-      flakes = flakes.filter((f) => f.life === undefined).slice(0, target)
+      const next = document.documentElement.dataset.snow ?? '0'
+      const changed = next !== mode
+      mode = next
+      const factor = mode === '1' ? 2.2 : mode === '2' ? 0 : mode === '3' ? 2.6 : mode === '4' ? 0.7 : 1
+      const target = Math.min(320, Math.round(((w * h) / 7000) * factor))
+      // Mod değişince taneler yeni hız ve boyutlarla baştan dağıtılır.
+      flakes = changed ? [] : flakes.filter((f) => f.life === undefined).slice(0, target)
       while (flakes.length < target) flakes.push(spawn())
     }
 
@@ -70,7 +78,7 @@ export function Snow() {
             flakes.splice(i, 1)
             continue
           }
-        } else if (f.y > h + 10) {
+        } else if (f.y > h + 10 || f.x > w + 30) {
           Object.assign(f, spawn(true))
         }
         ctx.globalAlpha = f.life !== undefined ? Math.min(1, f.life * 1.5) : 0.35 + f.r / 5

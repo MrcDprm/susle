@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { newOwnerKey, newTreeId, OWNER_KEY_PATTERN, TREE_ID_PATTERN } from '@/lib/ids'
-import { createTreeSchema, hangOrnamentSchema, MAX_BODY } from '@/lib/validation'
+import { createTreeSchema, hangOrnamentSchema, MAX_BODY, TREE_STYLES } from '@/lib/validation'
 
 const base = { treeId: 'abcdefgh23', authorName: 'Ayşe', kind: 3, body: 'Mutlu yıllar', isPublic: false, token: 't' }
 
@@ -18,7 +18,8 @@ describe('createTreeSchema', () => {
   it('40 karakteri geçen adı, olmayan stili ve dili reddeder', () => {
     expect(createTreeSchema.safeParse({ name: 'a'.repeat(41), style: 0, lang: 'tr' }).success).toBe(false)
     expect(createTreeSchema.safeParse({ name: 'a'.repeat(40), style: 0, lang: 'tr' }).success).toBe(true)
-    expect(createTreeSchema.safeParse({ name: 'x', style: 6, lang: 'tr' }).success).toBe(false)
+    expect(createTreeSchema.safeParse({ name: 'x', style: TREE_STYLES - 1, lang: 'tr' }).success).toBe(true)
+    expect(createTreeSchema.safeParse({ name: 'x', style: TREE_STYLES, lang: 'tr' }).success).toBe(false)
     expect(createTreeSchema.safeParse({ name: 'x', style: 5, lang: 'tr' }).success).toBe(true)
     expect(createTreeSchema.safeParse({ name: 'x', style: 1.5, lang: 'tr' }).success).toBe(false)
     expect(createTreeSchema.safeParse({ name: 'x', style: 0, lang: 'de' }).success).toBe(false)

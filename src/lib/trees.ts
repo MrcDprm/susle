@@ -23,7 +23,7 @@ export type OrnamentView = {
 
 export async function createTree(
   db: Db,
-  input: { name: string; style: number; lang: 'tr' | 'en' },
+  input: { name: string; style: number; lang: 'tr' | 'en'; look?: Look; note?: string | null },
   now = new Date(),
 ): Promise<{ id: string; ownerKey: string }> {
   const ownerKey = newOwnerKey()
@@ -35,6 +35,8 @@ export async function createTree(
         name: input.name,
         style: input.style,
         lang: input.lang,
+        look: input.look ?? {},
+        note: input.note ?? null,
         ownerKeyHash: sha256(ownerKey),
         revealAt: revealAtFor(now),
         createdAt: now,

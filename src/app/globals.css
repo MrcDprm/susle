@@ -1322,9 +1322,14 @@ textarea:focus-visible {
   flex: none;
 }
 
-/* Gökyüzü seçenekleri: kuzey ışıkları ve alacakaranlık */
+/* Gökyüzü seçenekleri. Sayfada html data-sky, önizlemede sky-N sınıfı hangisinin görüneceğini seçer:
+   0 gece, 1 kuzey ışıkları, 2 alacakaranlık, 3 Samanyolu, 4 kar bulutları, 5 havai fişek. */
+.twilight,
+.overcast,
+.milky,
 .aurora,
-.twilight {
+.clouds,
+.fireworks {
   position: absolute;
   inset: 0;
   opacity: 0;
@@ -1332,9 +1337,17 @@ textarea:focus-visible {
   pointer-events: none;
 }
 
-html[data-sky='1'] .aurora,
-html[data-sky='2'] .twilight {
+:is(html[data-sky='1'] .sky, .sky-1) .aurora,
+:is(html[data-sky='2'] .sky, .sky-2) .twilight,
+:is(html[data-sky='3'] .sky, .sky-3) .milky,
+:is(html[data-sky='4'] .sky, .sky-4) :is(.overcast, .clouds),
+:is(html[data-sky='5'] .sky, .sky-5) .fireworks {
   opacity: 1;
+}
+
+.stars,
+.moon {
+  transition: opacity 1.2s ease;
 }
 
 .aurora span {
@@ -1374,12 +1387,200 @@ html[data-sky='2'] .twilight {
   background: linear-gradient(to bottom, rgb(40 24 80 / 0.15) 0%, rgb(120 64 130 / 0.55) 34%, rgb(236 128 96 / 0.7) 62%, rgb(250 176 110 / 0.75) 100%);
 }
 
-html[data-sky='2'] .stars {
+:is(html[data-sky='2'] .sky, .sky-2) .stars {
   opacity: 0.45;
 }
 
-html[data-sky='2'] .moon {
+:is(html[data-sky='2'] .sky, .sky-2) .moon {
   background: radial-gradient(circle at 36% 34%, #fff3e0 0 40%, #f5c9a0 72%);
+}
+
+/* Samanyolu: çapraz uzanan soluk ışık kuşağı ve yoğun yıldız tozu, ay yok. */
+.milky::before {
+  content: '';
+  position: absolute;
+  left: -30%;
+  top: 4%;
+  width: 160%;
+  height: 34%;
+  transform: rotate(-16deg);
+  background: radial-gradient(ellipse at center, rgb(238 228 255 / 0.34), rgb(170 160 235 / 0.16) 45%, transparent 70%);
+  filter: blur(10px);
+}
+
+.milky::after {
+  content: '';
+  position: absolute;
+  left: -10%;
+  top: 0;
+  width: 120%;
+  height: 50%;
+  transform: rotate(-16deg);
+  background-image:
+    radial-gradient(1px 1px at 12% 52%, #fff, transparent), radial-gradient(1px 1px at 18% 47%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 25% 55%, #fff, transparent), radial-gradient(1px 1px at 31% 44%, #fff, transparent),
+    radial-gradient(1px 1px at 37% 51%, #fff, transparent), radial-gradient(1.5px 1.5px at 44% 46%, #fff, transparent),
+    radial-gradient(1px 1px at 49% 58%, #fff, transparent), radial-gradient(1px 1px at 56% 49%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 62% 53%, #fff, transparent), radial-gradient(1px 1px at 68% 45%, #fff, transparent),
+    radial-gradient(1px 1px at 74% 56%, #fff, transparent), radial-gradient(1.5px 1.5px at 81% 50%, #fff, transparent),
+    radial-gradient(1px 1px at 87% 47%, #fff, transparent), radial-gradient(1px 1px at 93% 54%, #fff, transparent);
+  opacity: 0.85;
+}
+
+:is(html[data-sky='3'] .sky, .sky-3) .moon {
+  opacity: 0;
+}
+
+/* Kar bulutları: kapalı, mor grisi gökyüzü; ay bulutların arkasında. */
+.overcast {
+  background: linear-gradient(#262a45, #43476a 58%, #62658a);
+}
+
+:is(html[data-sky='4'] .sky, .sky-4) .stars {
+  opacity: 0;
+}
+
+:is(html[data-sky='4'] .sky, .sky-4) .moon {
+  opacity: 0.3;
+  filter: blur(4px);
+}
+
+.clouds span {
+  position: absolute;
+  width: 80%;
+  height: 16%;
+  border-radius: 50%;
+  background: rgb(128 132 168 / 0.55);
+  filter: blur(20px);
+  animation: drift 50s ease-in-out infinite alternate;
+}
+
+.clouds span:nth-child(1) { top: 4%; left: -14%; }
+.clouds span:nth-child(2) { top: 14%; left: 40%; width: 90%; animation-duration: 64s; animation-delay: -20s; }
+.clouds span:nth-child(3) { top: 26%; left: -24%; animation-duration: 58s; animation-delay: -8s; }
+.clouds span:nth-child(4) { top: 36%; left: 46%; height: 12%; animation-duration: 72s; animation-delay: -30s; }
+
+@keyframes drift {
+  from { transform: translateX(-8%); }
+  to { transform: translateX(8%); }
+}
+
+/* Havai fişek: halka halinde açılan ışık noktaları, her biri kendi zamanında. */
+.fw {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  box-shadow:
+    0 -30px 0 0, 21px -21px 0 0, 30px 0 0 0, 21px 21px 0 0, 0 30px 0 0, -21px 21px 0 0, -30px 0 0 0, -21px -21px 0 0,
+    11px -27px 0 -1px, 27px -11px 0 -1px, 27px 11px 0 -1px, 11px 27px 0 -1px, -11px 27px 0 -1px, -27px 11px 0 -1px,
+    -27px -11px 0 -1px, -11px -27px 0 -1px, 0 -16px 0 -1px, 16px 0 0 -1px, 0 16px 0 -1px, -16px 0 0 -1px;
+  animation: burst 6.4s ease-out infinite;
+}
+
+.fw.f0 { left: 18%; top: 12%; color: #ff6b6b; }
+.fw.f1 { left: 72%; top: 8%; color: #ffd166; animation-delay: 1.3s; }
+.fw.f2 { left: 44%; top: 20%; color: #7bdff2; animation-delay: 2.6s; }
+.fw.f3 { left: 86%; top: 24%; color: #c77dff; animation-delay: 3.8s; }
+.fw.f4 { left: 30%; top: 4%; color: #6be38b; animation-delay: 5s; }
+
+@keyframes burst {
+  0% { transform: scale(0.1); opacity: 0; }
+  3% { opacity: 1; }
+  28% { transform: scale(1.35); opacity: 0.95; }
+  42% { transform: scale(1.6) translateY(6px); opacity: 0; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Uzak manzara katmanı: dağlar, şehir, göl ve deniz. Alt kenarı karlı tepenin arkasında kalır. */
+.backdrop {
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--ground-h) * 0.55);
+  z-index: 1;
+  width: 100%;
+  height: clamp(150px, 44vw, 320px);
+  pointer-events: none;
+}
+
+/* Manzaradaki küçük hareketler */
+.bulb {
+  animation: bulb 2.4s ease-in-out infinite;
+}
+.bulb.b1 { animation-delay: -0.8s; }
+.bulb.b2 { animation-delay: -1.6s; }
+
+@keyframes bulb {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.beacon {
+  animation: beacon 1.8s steps(2, jump-none) infinite;
+}
+
+@keyframes beacon {
+  0%, 60% { opacity: 1; }
+  61%, 100% { opacity: 0.2; }
+}
+
+.lamp-glow {
+  animation: glow 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+.skater {
+  animation: skate 16s ease-in-out infinite alternate;
+}
+.skater.s2 { animation-duration: 21s; animation-direction: alternate-reverse; }
+
+@keyframes skate {
+  from { transform: translateX(-70px); }
+  to { transform: translateX(90px); }
+}
+
+.lift {
+  animation: lift 5s linear infinite;
+}
+
+@keyframes lift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(33.33px, -10.67px); }
+}
+
+.beam {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+  animation: sweep 5s ease-in-out infinite alternate;
+}
+
+@keyframes sweep {
+  from { transform: rotate(-10deg) scaleX(1); opacity: 0.9; }
+  to { transform: rotate(12deg) scaleX(0.35); opacity: 0.5; }
+}
+
+.shimmer {
+  animation: shimmer 3s ease-in-out infinite alternate;
+}
+
+@keyframes shimmer {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+.bob {
+  animation: bob 4s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(1.5px) rotate(2deg); }
 }
 
 /* Büyüyen ağaç: etrafta parlayan yıldızlar */
@@ -1479,45 +1680,188 @@ html[data-sky='2'] .moon {
   position: sticky;
   top: 0;
   z-index: 2;
-  margin: 0 -18px 12px;
-  padding: 10px 0 6px;
-  display: flex;
-  justify-content: center;
-  background: linear-gradient(var(--gok-ust), var(--gok-orta));
+  margin: 0 -18px 14px;
   border-bottom: 1px solid rgb(0 0 0 / 0.08);
 }
 
-.customize-preview .tree {
-  height: min(30svh, 260px);
-  width: auto;
+/* Önizleme sahnesi: gökyüzü, uzak ve yakın manzara, ağaç ve kar birlikte. */
+.scene-preview {
+  position: relative;
+  height: min(34svh, 300px);
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(var(--gok-ust), var(--gok-orta) 58%, var(--gok-alt));
 }
 
-.opt-group {
-  margin-bottom: 14px;
+.preview-sky {
+  position: absolute;
+  inset: 0;
 }
 
-.opt-row {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 6px 2px 8px;
-  scroll-snap-type: x proximity;
-  scrollbar-width: none;
+.preview-sky .stars {
+  height: 70%;
 }
 
-.opt-row::-webkit-scrollbar {
+.preview-sky .moon {
+  top: 9%;
+  right: 8%;
+  width: 26px;
+  height: 26px;
+}
+
+.preview-sky .moon::after {
+  transform: scale(0.56);
+  transform-origin: 0 0;
+}
+
+.preview-sky .aurora span { top: 4%; height: 28%; filter: blur(16px); }
+.preview-sky .aurora span:nth-child(2) { top: 14%; height: 18%; }
+.preview-sky .aurora span:nth-child(3) { top: 0; height: 12%; }
+
+.preview-sky .fw {
+  transform-origin: center;
+  scale: 0.6;
+}
+
+.preview-sky .shooting-star {
   display: none;
 }
 
+.scene-preview .backdrop {
+  position: absolute;
+  bottom: 18%;
+  height: 58%;
+}
+
+.scene-preview .ground {
+  position: absolute;
+  height: 34%;
+}
+
+.preview-tree {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3%;
+  height: 80%;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.preview-tree .tree {
+  height: 100%;
+  width: auto;
+}
+
+.preview-snow {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.preview-snow span {
+  position: absolute;
+  top: -8px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.85;
+  animation: pfall 6s linear infinite;
+}
+
+.preview-snow span:nth-child(1) { left: 32.4%; animation-delay: -0.91s; animation-duration: 6.95s; }
+.preview-snow span:nth-child(2) { left: 7.2%; animation-delay: -3.22s; animation-duration: 6.10s; }
+.preview-snow span:nth-child(3) { left: 5.8%; animation-delay: -3.04s; animation-duration: 5.11s; }
+.preview-snow span:nth-child(4) { left: 43.4%; animation-delay: -0.42s; animation-duration: 5.27s; }
+.preview-snow span:nth-child(5) { left: 42.5%; animation-delay: -4.96s; animation-duration: 5.37s; }
+.preview-snow span:nth-child(6) { left: 22.3%; animation-delay: -3.76s; animation-duration: 7.84s; }
+.preview-snow span:nth-child(7) { left: 57.7%; animation-delay: -2.38s; animation-duration: 7.93s; }
+.preview-snow span:nth-child(8) { left: 4.7%; animation-delay: -5.15s; animation-duration: 5.87s; }
+.preview-snow span:nth-child(9) { left: 14.4%; animation-delay: -0.71s; animation-duration: 5.93s; }
+.preview-snow span:nth-child(10) { left: 81.6%; animation-delay: -1.08s; animation-duration: 6.74s; }
+.preview-snow span:nth-child(11) { left: 63.9%; animation-delay: -2.23s; animation-duration: 6.64s; }
+.preview-snow span:nth-child(12) { left: 6.3%; animation-delay: -0.36s; animation-duration: 5.62s; }
+.preview-snow span:nth-child(13) { left: 68.0%; animation-delay: -2.57s; animation-duration: 5.94s; }
+.preview-snow span:nth-child(14) { left: 58.6%; animation-delay: -2.72s; animation-duration: 5.90s; }
+.preview-snow span:nth-child(15) { left: 79.4%; animation-delay: -4.19s; animation-duration: 5.73s; }
+.preview-snow span:nth-child(16) { left: 57.4%; animation-delay: -3.15s; animation-duration: 7.63s; }
+.preview-snow span:nth-child(17) { left: 72.9%; animation-delay: -1.73s; animation-duration: 7.94s; }
+.preview-snow span:nth-child(18) { left: 11.8%; animation-delay: -2.51s; animation-duration: 7.27s; }
+.preview-snow span:nth-child(19) { left: 15.2%; animation-delay: -2.93s; animation-duration: 5.12s; }
+.preview-snow span:nth-child(20) { left: 66.8%; animation-delay: -4.59s; animation-duration: 6.72s; }
+.preview-snow span:nth-child(21) { left: 87.5%; animation-delay: -1.88s; animation-duration: 7.09s; }
+.preview-snow span:nth-child(22) { left: 59.4%; animation-delay: -3.48s; animation-duration: 6.37s; }
+.preview-snow span:nth-child(23) { left: 84.0%; animation-delay: -5.67s; animation-duration: 6.42s; }
+.preview-snow span:nth-child(24) { left: 66.4%; animation-delay: -0.36s; animation-duration: 7.10s; }
+.preview-snow span:nth-child(25) { left: 64.7%; animation-delay: -5.96s; animation-duration: 7.47s; }
+.preview-snow span:nth-child(26) { left: 28.5%; animation-delay: -2.31s; animation-duration: 7.01s; }
+.preview-snow span:nth-child(27) { left: 2.3%; animation-delay: -2.77s; animation-duration: 5.50s; }
+.preview-snow span:nth-child(28) { left: 11.7%; animation-delay: -0.35s; animation-duration: 7.30s; }
+
+.snow-0 .preview-snow span:nth-child(n + 15),
+.snow-4 .preview-snow span:nth-child(n + 17) {
+  display: none;
+}
+
+.snow-2 .preview-snow {
+  display: none;
+}
+
+.snow-3 .preview-snow span {
+  animation-name: pstorm;
+  animation-duration: 1.4s;
+  width: 2px;
+  height: 2px;
+}
+
+.snow-4 .preview-snow span {
+  width: 7px;
+  height: 7px;
+  opacity: 0.95;
+  animation-duration: 9s;
+}
+
+@keyframes pfall {
+  to { transform: translate(16px, 330px); }
+}
+
+@keyframes pstorm {
+  from { transform: translate(-80px, 0); }
+  to { transform: translate(200px, 330px); }
+}
+
+/* Seçenekler kaydırmasız ızgarada: dar ekranda dört, geniş ekranda daha fazla sütun. */
+.opt-group {
+  margin-bottom: 16px;
+}
+
+.opt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 8px;
+  padding-top: 6px;
+}
+
+.opt-grid.is-wide {
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+}
+
+.opt-grid.is-text {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .opt {
-  flex: none;
-  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  min-width: 76px;
-  padding: 8px 8px 6px;
+  justify-content: flex-start;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px 6px 7px;
   border-radius: 14px;
   border: 2px solid transparent;
   background: linear-gradient(var(--gok-orta), var(--gok-alt));
@@ -1528,20 +1872,25 @@ html[data-sky='2'] .moon {
   cursor: pointer;
 }
 
-.opt-row.is-text .opt {
-  min-width: 0;
-  padding: 10px 14px;
+.opt:focus-visible {
+  outline: 3px solid var(--altin);
+  outline-offset: 2px;
+}
+
+.opt.is-on {
+  border-color: var(--kirmizi);
+  box-shadow: 0 0 0 3px rgb(215 38 61 / 0.22);
+}
+
+.is-text .opt {
+  padding: 9px 13px;
   background: #fff;
   color: var(--koyu);
   border-color: var(--cizgi);
   font-size: 14px;
 }
 
-.opt.is-on {
-  border-color: var(--kirmizi);
-}
-
-.opt-row.is-text .opt.is-on {
+.is-text .opt.is-on {
   border-color: var(--kirmizi);
   background: #fde8eb;
 }
@@ -1557,47 +1906,164 @@ html[data-sky='2'] .moon {
 }
 
 .opt-icon.wide {
-  width: 64px;
+  width: 72px;
   height: 32px;
 }
 
 .opt-name {
-  max-width: 88px;
+  max-width: 100%;
   text-align: center;
+  overflow-wrap: anywhere;
 }
 
-.opt-ribbon {
-  display: block;
-  width: 56px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgb(46 107 69);
+.opt-scene,
+.opt-sky {
   position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 9px;
   overflow: hidden;
 }
 
-.opt-ribbon::after {
-  content: '';
-  position: absolute;
-  left: -6px;
-  right: -6px;
-  top: 12px;
-  height: 6px;
-  border-radius: 6px;
-  transform: rotate(-12deg);
+.opt-scene {
+  background: linear-gradient(var(--gok-ust), var(--gok-alt));
 }
 
-.opt-ribbon.r1::after { background: repeating-linear-gradient(90deg, #f2c14e 0 3px, transparent 3px 5px); }
-.opt-ribbon.r2::after { background: repeating-linear-gradient(90deg, #e6ebf2 0 3px, transparent 3px 5px); }
-.opt-ribbon.r3::after { background: var(--kirmizi); }
+.opt-scene .backdrop.mini {
+  position: absolute;
+  bottom: 24%;
+  height: 72%;
+}
+
+.opt-scene .ground.mini {
+  position: absolute;
+  height: 44%;
+}
+
+.opt-scene :is(.cat, .smoke, .skater) {
+  display: none;
+}
+
+.opt-sky.s0 {
+  background:
+    radial-gradient(circle at 76% 32%, #fff6dc 0 7%, transparent 8%),
+    radial-gradient(1.5px 1.5px at 20% 30%, #fff, transparent), radial-gradient(1.5px 1.5px at 40% 18%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 58% 40%, #fff, transparent), linear-gradient(#0b1630, #36487f);
+}
+.opt-sky.s1 {
+  background:
+    linear-gradient(165deg, transparent 18%, rgb(80 230 170 / 0.6) 38%, rgb(110 140 255 / 0.5) 52%, transparent 70%),
+    linear-gradient(#0b1630, #36487f);
+}
+.opt-sky.s2 { background: linear-gradient(#2a2060, #7a4a8a 48%, #f08a60); }
+.opt-sky.s3 {
+  background:
+    linear-gradient(150deg, transparent 30%, rgb(230 220 255 / 0.45) 47%, transparent 62%),
+    radial-gradient(1.5px 1.5px at 30% 40%, #fff, transparent), radial-gradient(1.5px 1.5px at 60% 55%, #fff, transparent),
+    linear-gradient(#070d22, #1b2a55);
+}
+.opt-sky.s4 { background: radial-gradient(ellipse at 30% 30%, rgb(150 154 190 / 0.8), transparent 50%), linear-gradient(#2b2f48, #5d6085); }
+.opt-sky.s5 {
+  background:
+    radial-gradient(circle at 28% 36%, #ff6b6b 0 3%, rgb(255 107 107 / 0.25) 4%, transparent 15%),
+    radial-gradient(circle at 70% 28%, #ffd166 0 3%, rgb(255 209 102 / 0.25) 4%, transparent 15%),
+    radial-gradient(circle at 54% 62%, #7bdff2 0 2%, transparent 11%),
+    linear-gradient(#0b1630, #36487f);
+}
+
+.customize {
+  position: relative;
+}
 
 .customize-actions {
   position: sticky;
   bottom: 0;
+  z-index: 3;
   margin: 0 -18px -20px;
   padding: 12px 18px max(14px, env(safe-area-inset-bottom));
   background: var(--kar);
   border-top: 1px solid var(--cizgi);
+}
+
+/* Kaydedilmemiş değişiklik sorusu */
+.ask {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  background: rgb(8 14 32 / 0.55);
+}
+
+.ask-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(100%, 420px);
+  padding: 22px 18px 18px;
+  border-radius: 20px;
+  background: var(--kar);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.35);
+  animation: sheet 0.2s ease-out;
+}
+
+.ask-card h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.ask-card p {
+  margin: 0 0 6px;
+  color: var(--koyu-soluk);
+}
+
+.ask-card :is(.btn, .btn-small, .btn-ghost) {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Geniş ekranda süsle penceresi ortada ve iki sütun: solda önizleme, sağda seçenekler. */
+@media (min-width: 900px) {
+  .customize-dialog {
+    max-width: 1040px;
+    margin: auto;
+    border-radius: 22px;
+  }
+
+  .customize-dialog .dialog-body::before {
+    display: none;
+  }
+
+  .customize-dialog .dialog-body {
+    padding-top: 18px;
+  }
+
+  .look-editor {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: start;
+  }
+
+  .look-editor .customize-preview {
+    grid-row: 1 / span 30;
+    top: 0;
+    margin: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 0;
+  }
+
+  .look-editor .scene-preview {
+    height: min(72dvh, 640px);
+  }
+
+  .ask {
+    align-items: center;
+  }
 }
 
 /* Süs asınca davet kartı */

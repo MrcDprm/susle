@@ -1,15 +1,17 @@
 import { z } from 'zod'
+import { SONG_COUNT } from './songs'
 
 // Ağacın görünümü. Her alan bir seçeneğin sırası; seçeneklerin adları i18n.ts'te.
+// Yeni seçenekler hep sona eklenir; kayıtlı ağaçların eski seçimleri aynı anlamda kalır.
 export const LOOK_OPTIONS = {
-  topper: 6,
-  lights: 6,
-  ribbon: 4,
-  base: 4,
-  scene: 3,
-  sky: 3,
-  snow: 3,
-  music: 3,
+  topper: 12,
+  lights: 10,
+  ribbon: 8,
+  base: 8,
+  scene: 6,
+  sky: 6,
+  snow: 5,
+  music: SONG_COUNT,
 } as const
 
 export type LookKey = keyof typeof LOOK_OPTIONS
