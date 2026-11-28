@@ -2,7 +2,7 @@
 
 # Süsle
 
-Kendi yılbaşı ağacını aç ve linkini paylaş. Arkadaşların ağacına mesajlı süsler asar, her mesaj Türkiye saatiyle 1 Ocak gece yarısına kadar kilitli kalır. Ağaç sonrasında da anı olarak yayında durur.
+Kendi yılbaşı ağacını aç ve linkini paylaş. Sevdiklerin ağacına mesajlı süsler asar, her mesaj Türkiye saatiyle 1 Ocak gece yarısına kadar kilitli kalır. Ağaç sonrasında da anı olarak yayında durur.
 
 Canlı: https://susle.miracdeprem.com
 

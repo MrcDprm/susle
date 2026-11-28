@@ -13,6 +13,7 @@ Genel:
 - yılbaşı mesajı
 
 Daha belirli:
+- sevdiklerinin süslediği yılbaşı ağacı
 - arkadaşların süslediği yılbaşı ağacı
 - yılbaşı ağacına mesaj bırakma
 - yılbaşında açılan mesajlar
