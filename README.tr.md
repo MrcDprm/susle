@@ -9,16 +9,23 @@ Canlı: https://susle.miracdeprem.com
 ## Özellikler
 
 - **Hesapsız ağaç açma:** bir ad ve altı ağaçtan biri seçilir: çam, karlı çam, göknar, ladin, gümüş ve beyaz; her birinin biçimi, gölgesi ve sarkık dal uçları farklı.
+- **Ağacını süsle:** sahip ağacın türünü, tepesindeki süsü, ışıkları, simi ve saksısını seçer. Altı tepe süsü var: yıldız, kalp, ay, kar tanesi, nazar boncuğu ve fiyonk. Altı ışık takımı, dört sim, dört saksı ve sepet var. Arkadaki sahne karlı köy, çam ormanı ya da şehir; gökyüzü gece, kuzey ışıkları ya da alacakaranlık olur. Kar yoğunluğu ve çalan şarkı da seçilir, ağacın altına kısa bir not yazılır. Her seçim önizlemede ve arkadaki sahnede anında görünür.
 - **Hemen paylaşım:** ağaç açılır açılmaz paylaş menüsü, WhatsApp, X, Instagram hikayesi ve gizli sahip linki bir pencerede gelir. Sahip linki kopyalanmadan ya da kaydedildiği onaylanmadan pencere kapanmaz, çünkü ağacın tek anahtarı o link.
-- **Süs asma:** nar, nazar boncuğu, çay bardağı ve mandalina dahil 12 süsten biri seçilir, en fazla 500 karakterlik mesaj yazılır, isimle ya da anonim gönderilir; açıldıktan sonra herkesin okuyup okuyamayacağı seçilir.
+- **Süs asma:** nar, nazar boncuğu, çay bardağı, piyango bileti, simit ve salep fincanı dahil 20 süsten biri seçilir, en fazla 500 karakterlik mesaj yazılır, isimle ya da anonim gönderilir; açıldıktan sonra herkesin okuyup okuyamayacağı seçilir. Ne yazacağını bilemeyen hazır dileklerden birine dokunur.
+- **Süs astıktan sonra:** asan kişiye hatırlatıcı kurma, ağacı başkalarına gönderme ve kendi ağacını açma yolu gösterilir. Bu tarayıcıdan asılan süsler ağaçta halkayla işaretlenir.
 - **Yılbaşına kadar kilitli:** 1 Ocak gece yarısından önce mesajları kimse okuyamaz, ağacın sahibi de. Sunucu o ana kadar mesaj metnini hiç göndermez; sonra sahip hepsini, ziyaretçiler yalnızca herkese açık olanları okur.
 - **Saniyesi saniyesine geri sayım;** mesajlar açılınca sayfa kendini yeniler.
+- **Büyüyen ağaç:** 10 süste ağacın çevresinde yıldızlar parlar, 25 süste ışıklar sıklaşır, 50 süste ağacın arkasında ışık halesi yanar. Ağacın başlığı bir sonraki adıma kaç süs kaldığını söyler.
 - **Canlı ağaç:** sayfa açıkken 20 saniyede bir yeni süs var mı diye bakılır; gelen süs dalına iner, üstte kısa bir bildirim çıkar.
 - **Yılbaşı hatırlatıcısı:** tek dokunuşla 1 Ocak 00:00'da alarm çalan, içinde ağacın linki olan bir takvim etkinliği eklenir; telefonun takvimine ya da Google Takvim'e.
 - **Gece yarısı kutlaması:** yeni yılın ilk günlerinde ağacı açan kısa bir kutlama ve kar patlaması görür.
+- **Mesajları tek tek okuma:** açılıştan sonra mesajlar tam ekran kartlarda okunur; kaydırarak, düğmelerle ya da ok tuşlarıyla geçilir.
+- **Yılın mesajı:** sahip herkese açık bir mesajı seçip onu süsüyle birlikte Instagram hikaye görseline çevirir.
+- **Anı sayfası:** bütün mesajlar tek sayfada listelenir, tarayıcıdan yazdırılır ya da PDF olarak kaydedilir.
+- **Yeni süs rozeti:** ana sayfadaki ağaç listesinde, sahibin son ziyaretinden sonra asılan süs sayısı görünür.
 - **Telefona göre kurulmuş kış sahnesi:** yağan kar, yanıp sönen yıldızlar, ay ve kayan yıldız, ışığı yanan evler ve bacadan tüten duman, arada geçen bir kedi, yanıp sönen ampuller, sallanan süsler, süs sayısıyla çoğalan hediye kutuları. Ağaca dokununca dallardan kar silkelenir.
-- **Müzik kutusu:** Jingle Bells, Web Audio ile çan tınısında çalınır, ses dosyası yok. Tarayıcılar sesin kendiliğinden başlamasına izin vermediği için ilk dokunuşla başlar, bir düğmeyle kalıcı olarak kapatılır.
-- **Paylaşım:** link kopyalama, WhatsApp, X, sunucuda üretilen link önizleme görseli ve telefonun paylaşım menüsünü açan 1080×1920 Instagram hikaye görseli.
+- **Müzik kutusu:** Jingle Bells, We Wish You a Merry Christmas ve Deck the Halls, Web Audio ile çan tınısında çalınır, ses dosyası yok. Şarkıyı ağacın sahibi seçer. Tarayıcılar sesin kendiliğinden başlamasına izin vermediği için ilk dokunuşla başlar, bir düğmeyle kalıcı olarak kapatılır.
+- **Paylaşım:** link kopyalama, WhatsApp, X, sunucuda üretilen link önizleme görseli ve telefonun paylaşım menüsünü açan 1080×1920 Instagram hikaye görseli. Görseller ağacın seçilen görünümüyle çizilir, açılıştan önceki hikaye görselinde yılbaşına kalan gün yazar.
 - **Sahip araçları:** ağacın adını değiştirme, yeni süsleri kapatma, süs kaldırma, ağacı silme.
 - **Dal başına 24 süs,** ağaç başına en fazla 480.
 - **Türkçe ve İngilizce.**
@@ -32,6 +39,7 @@ Canlı: https://susle.miracdeprem.com
 </p>
 <p>
   <img src="docs/screenshots/hang.png" width="200" alt="Süs seçip mesaj yazma">
+</p>
 <p>
   <img src="docs/screenshots/card.png" width="200" alt="Açılan bir mesajı okuma">
   <img src="docs/screenshots/story.png" width="200" alt="Üretilen Instagram hikaye görseli">
@@ -81,4 +89,5 @@ Canlı ortam için bir Neon veritabanı açılır, adresi `DATABASE_URL` değiş
 - Aynı çizim kodu hem React'teki etkileşimli SVG'yi hem de `next/og`'un paylaşım görsellerine çevirdiği SVG metnini üretiyor; ağaç her yerde aynı görünüyor.
 - Ses dosyası koymak yerine çan sesini Web Audio osilatörleri ve ileriye bakan bir zamanlayıcıyla ürettim; tarayıcıların otomatik oynatma kurallarının sesin ne zaman başlayabileceğini nasıl belirlediğini öğrendim.
 - RFC 5545'e göre takvim dosyasını elle yazdım; virgül, noktalı virgül ve satır sonlarını kaçışladım, böylece ağacın adı etkinliğe yeni alan ekleyemiyor.
+- Ağacın görünümünü tek bir jsonb sütununda tuttum. Okurken her alanı tek tek doğruluyorum; bozuk ya da eski bir değer varsayılana dönüyor, sayfa hiç çökmüyor. Veritabanı değişikliği yalnızca sütun ekliyor, mevcut ağaçlara dokunmuyor.
 - Önce telefonu düşündüm: ağaç sayfası tek ekran, formlar alttan açılan sayfalar, sistem hareketi azaltma isterse bütün animasyonlar duruyor.

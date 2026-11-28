@@ -9,6 +9,7 @@ const STARS: [number, number, number][] = [
 ]
 
 // Arka plan: gece gökyüzü, yanıp sönen yıldızlar, ay, ara sıra kayan bir yıldız ve kar.
+// Ağacın gökyüzü seçimi html data-sky ile gelir: 1 kuzey ışıkları, 2 alacakaranlık.
 export function Sky() {
   return (
     <div className="sky" aria-hidden="true">
@@ -17,6 +18,12 @@ export function Sky() {
           <circle key={i} cx={x} cy={y} r={r} className={`star s${i % 5}`} />
         ))}
       </svg>
+      <div className="twilight" />
+      <div className="aurora">
+        <span />
+        <span />
+        <span />
+      </div>
       <div className="moon" />
       <div className="shooting-star" />
       <Snow />

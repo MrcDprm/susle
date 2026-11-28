@@ -3,12 +3,13 @@ import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { CreateTree } from '@/components/CreateTree'
 import { Header } from '@/components/Header'
+import { NewBadge } from '@/components/NewBadge'
 import { Ground } from '@/components/scene/Ground'
 import { TreeView } from '@/components/TreeView'
 import { getDb } from '@/lib/db/client'
 import { dict, isLang, localePath } from '@/lib/i18n'
 import { ownedTreeKeys, siteUrl } from '@/lib/server'
-import { getTree, isOwner } from '@/lib/trees'
+import { countOrnaments, getTree, isOwner } from '@/lib/trees'
 
 const DEMO = [6, 1, 7, 9, 2, 8, 0, 3, 11, 5, 10, 4, 1, 6, 9]
 
@@ -19,7 +20,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const nonce = (await headers()).get('x-nonce') ?? undefined
 
   // Ağaç listesi ek bilgi; veritabanına ulaşılamazsa ana sayfa yine açılır.
-  let mine: { id: string; name: string; lang: string }[] = []
+  let mine: { id: string; name: string; lang: string; total: number }[] = []
   const owned = await ownedTreeKeys()
   if (owned.length > 0) {
     try {
@@ -27,7 +28,8 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       const found = await Promise.all(
         owned.map(async ({ id, key }) => {
           const tree = await getTree(db, id)
-          return tree && isOwner(tree, key) ? { id, name: tree.name, lang: tree.lang } : null
+          if (!tree || !isOwner(tree, key)) return null
+          return { id, name: tree.name, lang: tree.lang, total: await countOrnaments(db, id) }
         }),
       )
       mine = found.filter((x) => x !== null)
@@ -76,6 +78,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
               {mine[0] && (
                 <Link className="btn-round" href={localePath(mine[0].lang === 'en' ? 'en' : 'tr', `/a/${mine[0].id}`)}>
                   {t.home.myTree}
+                  <NewBadge lang={lang} treeId={mine[0].id} total={mine[0].total} />
                 </Link>
               )}
             </div>
@@ -97,6 +100,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                   {mine.map((m) => (
                     <li key={m.id}>
                       <Link href={localePath(m.lang === 'en' ? 'en' : 'tr', `/a/${m.id}`)}>{m.name}</Link>
+                      <NewBadge lang={lang} treeId={m.id} total={m.total} />
                     </li>
                   ))}
                 </ul>

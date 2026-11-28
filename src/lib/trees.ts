@@ -3,6 +3,7 @@ import { and, asc, count, eq, sql } from 'drizzle-orm'
 import { rowsOf, type Db } from './db/client'
 import { ornaments, trees } from './db/schema'
 import { newOwnerKey, newTreeId, sameHash, sha256 } from './ids'
+import { normalizeLook, type Look } from './look'
 import { isRevealed, revealAtFor } from './reveal'
 
 export const PAGE_SIZE = 24
@@ -107,7 +108,7 @@ export async function listOrnaments(
   }))
 }
 
-export type HangResult = { ok: true; index: number } | { ok: false; reason: 'missing' | 'closed' | 'revealed' | 'full' }
+export type HangResult = { ok: true; index: number; id: string } | { ok: false; reason: 'missing' | 'closed' | 'revealed' | 'full' }
 
 export async function hangOrnament(
   db: Db,
@@ -115,11 +116,12 @@ export async function hangOrnament(
   now = new Date(),
 ): Promise<HangResult> {
   for (let attempt = 0; attempt < 4; attempt++) {
+    const id = randomUUID()
     try {
       // Ağaç açık mı, kilit tarihi geçmedi mi, dolu mu: hepsi tek komutta kontrol edilir.
       const result = await db.execute(sql`
         INSERT INTO ornaments (id, tree_id, slot, kind, author_name, body, is_public, ip_hash, created_at)
-        SELECT ${randomUUID()}, t.id,
+        SELECT ${id}, t.id,
           (SELECT COALESCE(MAX(o.slot) + 1, 0) FROM ornaments o WHERE o.tree_id = t.id),
           ${input.kind}, ${input.authorName}, ${input.body}, ${input.isPublic}, ${input.ipHash}, ${now.toISOString()}
         FROM trees t
@@ -130,7 +132,7 @@ export async function hangOrnament(
         RETURNING slot
       `)
       if (rowsOf<{ slot: number }>(result).length > 0) {
-        return { ok: true, index: (await countOrnaments(db, input.treeId)) - 1 }
+        return { ok: true, index: (await countOrnaments(db, input.treeId)) - 1, id }
       }
       const tree = await getTree(db, input.treeId)
       if (!tree) return { ok: false, reason: 'missing' }
@@ -143,6 +145,35 @@ export async function hangOrnament(
     }
   }
   throw new Error('unreachable')
+}
+
+export async function updateLook(
+  db: Db,
+  treeId: string,
+  input: { style: number; look: Look; note: string | null },
+): Promise<void> {
+  await db.update(trees).set({ style: input.style, look: input.look, note: input.note }).where(eq(trees.id, treeId))
+}
+
+export function lookOf(tree: Tree): Look {
+  return normalizeLook(tree.look)
+}
+
+// Yılın mesajı için tek bir süs. Yalnızca açılıştan sonra ve herkese açık işaretlenmiş mesaj döner;
+// yazan gizli tuttuysa hikaye görseline giremez.
+export async function getPublicMessage(
+  db: Db,
+  tree: Tree,
+  ornamentId: string,
+  now = new Date(),
+): Promise<{ kind: number; authorName: string | null; body: string } | null> {
+  if (!isRevealed(tree.revealAt, now)) return null
+  const rows = await db
+    .select({ kind: ornaments.kind, authorName: ornaments.authorName, body: ornaments.body })
+    .from(ornaments)
+    .where(and(eq(ornaments.treeId, tree.id), eq(ornaments.id, ornamentId), eq(ornaments.isPublic, true)))
+    .limit(1)
+  return rows[0] ?? null
 }
 
 export async function renameTree(db: Db, treeId: string, name: string): Promise<void> {

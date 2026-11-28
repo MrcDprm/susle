@@ -1,6 +1,6 @@
-import { boolean, integer, pgTable, smallint, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core'
+import { boolean, integer, jsonb, pgTable, smallint, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core'
 
-// drizzle/0000_init.sql ile birebir aynı olmalı; testler tabloları o dosyadan kurar.
+// drizzle klasöründeki SQL dosyalarıyla birebir aynı olmalı; testler tabloları o dosyalardan kurar.
 export const trees = pgTable('trees', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -10,6 +10,9 @@ export const trees = pgTable('trees', {
   accepting: boolean('accepting').notNull().default(true),
   revealAt: timestamp('reveal_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  // Görünüm seçenekleri; okunurken normalizeLook ile doğrulanır.
+  look: jsonb('look').notNull().default({}),
+  note: text('note'),
 })
 
 export const ornaments = pgTable(

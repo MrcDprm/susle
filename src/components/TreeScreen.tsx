@@ -6,22 +6,27 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { deleteOrnamentAction } from '@/app/actions'
 import { dict, localePath, type Lang } from '@/lib/i18n'
 import { openInBrowserUrl } from '@/lib/inapp'
-import { chime } from '@/lib/music'
+import { growthLevel, nextGrowth, type Look } from '@/lib/look'
+import { chime, setSong } from '@/lib/music'
 import type { OrnamentView } from '@/lib/trees'
 import { OrnamentIcon } from './Art'
 import { Countdown } from './Countdown'
+import { Customize } from './Customize'
 import { Dialog } from './Dialog'
 import { HangForm } from './HangForm'
 import { useInApp } from './OpenInBrowser'
 import { OwnerPanel } from './OwnerPanel'
 import { Ground } from './scene/Ground'
 import { puffAt } from './scene/Snow'
+import { applySceneLook, clearSceneLook } from './sceneLook'
+import { Reminder, ShareTools } from './ShareTools'
+import { Slideshow } from './Slideshow'
 import { TreeView } from './TreeView'
 import { Welcome } from './Welcome'
 
 export type ScreenProps = {
   lang: Lang
-  tree: { id: string; name: string; style: number; accepting: boolean; revealAt: string; year: number }
+  tree: { id: string; name: string; style: number; accepting: boolean; revealAt: string; year: number; look: Look; note: string | null }
   nowMs: number
   owner: boolean
   ownerUrl: string | null
@@ -54,6 +59,33 @@ export function TreeScreen(p: ScreenProps) {
   const [celebrate, setCelebrate] = useState(false)
   const known = useRef(p.total)
   known.current = Math.max(known.current, p.total)
+  const [customizeOpen, setCustomizeOpen] = useState(false)
+  const [invite, setInvite] = useState(false)
+  const [showOpen, setShowOpen] = useState(false)
+  const [mine, setMine] = useState<ReadonlySet<string>>(new Set())
+  const growth = growthLevel(p.total)
+  const upcoming = nextGrowth(p.total)
+  const mineKey = `susle-suslerim-${p.tree.id}`
+
+  // Ağacın gökyüzü, kar ve müziği; sayfadan çıkınca varsayılana döner.
+  useEffect(() => {
+    applySceneLook(p.tree.look)
+    setSong(p.tree.look.music)
+    return () => {
+      clearSceneLook()
+      setSong(0)
+    }
+  }, [p.tree.look])
+
+  // Bu tarayıcıdan asılan süsler ve sahibin son gördüğü süs sayısı tarayıcıda saklanır.
+  useEffect(() => {
+    try {
+      setMine(new Set(JSON.parse(localStorage.getItem(mineKey) ?? '[]') as string[]))
+      if (p.owner) localStorage.setItem(`susle-gorulen-${p.tree.id}`, String(p.total))
+    } catch {
+      // Tarayıcı depolamayı kapattıysa işaretler görünmez, başka bir şey bozulmaz.
+    }
+  }, [mineKey, p.owner, p.tree.id, p.total])
 
   // Canlı güncelleme: sayfa açıkken 20 saniyede bir süs sayısına bakılır, yeni süs gelince
   // ağaç yenilenir, yeni süs dalına iner ve üstte kısa bir bildirim çıkar.
@@ -113,9 +145,16 @@ export function TreeScreen(p: ScreenProps) {
     setTimeout(() => setSelected(i), 280)
   }
 
-  const onHung = (index: number) => {
+  const onHung = (index: number, id: string) => {
     setHangOpen(false)
-    setFlash(t.hang.done)
+    setInvite(true)
+    const next = new Set(mine).add(id)
+    setMine(next)
+    try {
+      localStorage.setItem(mineKey, JSON.stringify([...next]))
+    } catch {
+      // Depolama kapalıysa süs yine asılır, yalnızca işaret görünmez.
+    }
     chime('hang')
     const box = stage.current?.querySelector('.tree-wrap')?.getBoundingClientRect()
     if (box) puffAt(box.left + box.width / 2, box.top + box.height * 0.4)
@@ -142,7 +181,9 @@ export function TreeScreen(p: ScreenProps) {
       <section className="stage" ref={stage}>
         <div className="tree-head">
           <h1>{p.tree.name}</h1>
+          {p.tree.note && <p className="tree-note">{p.tree.note}</p>}
           <p className="count">{t.tree.count(p.total)}</p>
+          {!p.revealed && <p className="growth-hint">{upcoming ? t.growth.next(upcoming.left, upcoming.level) : t.growth.max}</p>}
           {p.revealed ? (
             <p className="revealed-note">
               {t.tree.revealed(p.tree.year)} {p.total > 0 && t.tree.tapHint}
@@ -173,10 +214,13 @@ export function TreeScreen(p: ScreenProps) {
             swingIndex={swing}
             onSelect={select}
             ornaments={p.ornaments.map((o) => ({ id: o.id, kind: o.kind, label: `${t.ornaments[o.kind]}, ${name(o)}` }))}
+            look={p.tree.look}
+            growth={growth}
+            mine={mine}
           />
         </div>
 
-        <Ground />
+        <Ground scene={p.tree.look.scene} />
 
         <div className="bar">
           {p.pageCount > 1 && (
@@ -192,8 +236,22 @@ export function TreeScreen(p: ScreenProps) {
                 {t.tree.hang}
               </button>
             )}
+            {p.revealed && p.messages.length > 0 && (
+              <button type="button" className="btn btn-hang" onClick={() => setShowOpen(true)}>
+                {t.show.open}
+              </button>
+            )}
             {p.owner && p.ownerUrl && (
-              <button type="button" className={canHang ? 'btn-round' : 'btn btn-hang'} onClick={() => setOwnerOpen(true)}>
+              <button type="button" className="btn-round" onClick={() => setCustomizeOpen(true)}>
+                {t.customize.open}
+              </button>
+            )}
+            {p.owner && p.ownerUrl && (
+              <button
+                type="button"
+                className={canHang || (p.revealed && p.messages.length > 0) ? 'btn-round' : 'btn btn-hang'}
+                onClick={() => setOwnerOpen(true)}
+              >
                 {t.owner.open}
               </button>
             )}
@@ -261,11 +319,56 @@ export function TreeScreen(p: ScreenProps) {
             revealAt={p.tree.revealAt}
             onDone={() => {
               setWelcomeOpen(false)
+              setCustomizeOpen(true)
               router.replace(localePath(p.lang, `/a/${p.tree.id}`), { scroll: false })
             }}
           />
         </Dialog>
       )}
+
+      {p.owner && p.ownerUrl && (
+        <Dialog open={customizeOpen} onClose={() => setCustomizeOpen(false)} label={t.customize.title} className="customize-dialog">
+          <Customize
+            lang={p.lang}
+            treeId={p.tree.id}
+            style={p.tree.style}
+            look={p.tree.look}
+            note={p.tree.note}
+            ornaments={p.ornaments.map((o) => ({ id: o.id, kind: o.kind, label: t.ornaments[o.kind] }))}
+            total={p.total}
+            growth={growth}
+            onClose={() => setCustomizeOpen(false)}
+          />
+        </Dialog>
+      )}
+
+      <Dialog open={invite} onClose={() => setInvite(false)} label={t.invite.title}>
+        <div className="invite">
+          <h2 className="patch-title">{t.invite.title}</h2>
+          <p className="welcome-lead">{t.invite.body}</p>
+          <Reminder lang={p.lang} treeId={p.tree.id} treeName={p.tree.name} revealAt={p.tree.revealAt} shareUrl={p.shareUrl} compact />
+          <p className="hint">{t.invite.shareLabel}</p>
+          <ShareTools lang={p.lang} treeId={p.tree.id} shareUrl={p.shareUrl} story={false} />
+          {!p.owner && (
+            <div className="invite-own">
+              <h3>{t.invite.ownTitle}</h3>
+              <p>{t.invite.ownBody}</p>
+              <Link className="btn" href={`${localePath(p.lang, '/')}#ac`}>
+                {t.invite.ownCta}
+              </Link>
+            </div>
+          )}
+          <div className="actions">
+            <button type="button" className="btn-small" onClick={() => setInvite(false)}>
+              {t.invite.close}
+            </button>
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog open={showOpen} onClose={() => setShowOpen(false)} label={t.show.open} className="show-dialog">
+        {showOpen && <Slideshow lang={p.lang} treeId={p.tree.id} messages={p.messages} owner={p.owner} onClose={() => setShowOpen(false)} />}
+      </Dialog>
 
       <Dialog open={celebrate} onClose={() => setCelebrate(false)} label={t.celebrate.title(p.tree.year)} className="celebrate">
         <div className="celebrate-body">
@@ -276,7 +379,7 @@ export function TreeScreen(p: ScreenProps) {
             className="btn"
             onClick={() => {
               setCelebrate(false)
-              document.querySelector('.messages')?.scrollIntoView({ behavior: 'smooth' })
+              if (p.messages.length > 0) setShowOpen(true)
             }}
           >
             {t.celebrate.go}
@@ -291,6 +394,7 @@ export function TreeScreen(p: ScreenProps) {
               <OrnamentIcon kind={current.kind} />
             </span>
             <h2 className="card-name">{name(current)}</h2>
+            {mine.has(current.id) && <p className="card-mine">{t.card.mine}</p>}
             {current.body !== null ? (
               <p className="card-body">{current.body}</p>
             ) : (

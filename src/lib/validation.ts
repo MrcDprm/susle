@@ -1,12 +1,14 @@
 import { z } from 'zod'
 import { TREE_ID_PATTERN } from './ids'
+import { lookSchema } from './look'
 
-export const ORNAMENT_KINDS = 12
+export const ORNAMENT_KINDS = 20
 export const TREE_STYLES = 6
 export const MAX_BODY = 500
 export const MAX_NAME = 30
 export const MAX_TREE_NAME = 40
 export const MAX_LINES = 15
+export const MAX_NOTE = 80
 
 // Görünmeyen ve yön değiştiren karakterler atılır; satır sonu ve sekme kalır.
 const INVISIBLE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2060-\u2069\uFEFF]/g
@@ -62,6 +64,18 @@ export const hangOrnamentSchema = z.object({
     .refine((v) => v.split('\n').length <= MAX_LINES, 'lines'),
   isPublic: z.boolean(),
   token: z.string().min(1).max(2048),
+})
+
+// Ağacını süsle ekranından gelen görünüm; not boşsa saklanmaz.
+export const customizeSchema = z.object({
+  style: z.number().int().min(0).max(TREE_STYLES - 1),
+  look: lookSchema,
+  note: z
+    .string()
+    .max(400)
+    .transform(oneLine)
+    .refine((v) => length(v) <= MAX_NOTE, 'long')
+    .transform((v) => (v === '' ? null : v)),
 })
 
 export type CreateTreeInput = z.input<typeof createTreeSchema>

@@ -6,7 +6,7 @@ import { CopyField } from './CopyField'
 import { OpenInBrowser, useInApp } from './OpenInBrowser'
 
 // Paylaşım linki, telefonun paylaş menüsü, WhatsApp, X ve Instagram hikayesi bir arada.
-export function ShareTools({ lang, treeId, shareUrl }: { lang: Lang; treeId: string; shareUrl: string }) {
+export function ShareTools({ lang, treeId, shareUrl, story = true }: { lang: Lang; treeId: string; shareUrl: string; story?: boolean }) {
   const t = dict(lang)
   const shareText = t.owner.shareText(shareUrl)
   const [canShare, setCanShare] = useState(false)
@@ -36,7 +36,7 @@ export function ShareTools({ lang, treeId, shareUrl }: { lang: Lang; treeId: str
           {t.owner.x}
         </a>
       </div>
-      <StoryShare lang={lang} treeId={treeId} />
+      {story && <StoryShare lang={lang} treeId={treeId} />}
     </div>
   )
 }

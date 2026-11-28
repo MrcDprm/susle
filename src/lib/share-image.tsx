@@ -2,11 +2,14 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { ImageResponse } from 'next/og'
 import { COLORS as C } from './art/palette'
+import { toSvgString, h } from './art/node'
+import { ornamentNodes } from './art/ornaments'
 import { treeSvgString } from './art/tree'
+import { growthLevel } from './look'
 import { dict, type Lang } from './i18n'
-import { isRevealed, revealYear } from './reveal'
+import { isRevealed, remainingUntil, revealYear } from './reveal'
 import { siteUrl } from './server'
-import type { Tree } from './trees'
+import { lookOf, type Tree } from './trees'
 
 type Font = { name: string; data: ArrayBuffer; weight: 500 | 700; style: 'normal' }
 let fonts: Promise<Font[]> | null = null
@@ -73,7 +76,7 @@ ${dots.join('')}
 
 export async function treeOgImage(tree: Tree | null, kinds: number[], total: number, lang: Lang) {
   const t = dict(lang)
-  const tree4 = svgSrc(treeSvgString(tree?.style ?? 1, kinds, 380, total))
+  const tree4 = svgSrc(treeSvgString(tree?.style ?? 1, kinds, 380, total, tree ? lookOf(tree) : undefined, growthLevel(total)))
   return new ImageResponse(
     (
       <div style={{ width: '100%', height: '100%', display: 'flex', position: 'relative', color: C.yazi, fontFamily: FONT }}>
@@ -97,8 +100,10 @@ export async function treeOgImage(tree: Tree | null, kinds: number[], total: num
 // Gökyüzünde ağacın adı ve davet, karlı zeminde herkesi kendi ağacını açmaya çağıran yazı.
 export async function treeStoryImage(tree: Tree, kinds: number[], total: number, lang: Lang) {
   const t = dict(lang)
-  const revealed = isRevealed(tree.revealAt, new Date())
-  const treeSvg = svgSrc(treeSvgString(tree.style, kinds, 640, total))
+  const now = new Date()
+  const revealed = isRevealed(tree.revealAt, now)
+  const left = remainingUntil(tree.revealAt, now)
+  const treeSvg = svgSrc(treeSvgString(tree.style, kinds, 600, total, lookOf(tree), growthLevel(total)))
   const host = new URL(siteUrl()).host
   const groundY = 1360
   return new ImageResponse(
@@ -111,8 +116,9 @@ export async function treeStoryImage(tree: Tree, kinds: number[], total: number,
             {revealed ? t.story.revealed(total, revealYear(tree.revealAt)) : t.story.invite}
           </div>
           {!revealed && <div style={{ fontSize: 36, fontWeight: 500, color: C.altin, marginTop: 14 }}>{t.story.count(total)}</div>}
+          {left && <div style={{ fontSize: 32, fontWeight: 700, color: C.yazi, marginTop: 18, padding: '10px 28px', borderRadius: 40, background: 'rgba(255,255,255,0.14)' }}>{t.story.daysLeft(left.days)}</div>}
         </div>
-        <img src={treeSvg} width={640} height={896} style={{ position: 'absolute', left: 220, top: groundY + 80 - 896 }} />
+        <img src={treeSvg} width={600} height={840} style={{ position: 'absolute', left: 240, top: groundY + 80 - 840 }} />
         <div style={{ position: 'absolute', top: 1520, left: 110, right: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', color: C.koyu }}>
           <div style={{ fontSize: 36, fontWeight: 500, lineHeight: 1.35, textAlign: 'center' }}>{t.story.promo}</div>
           <div style={{ fontSize: 40, fontWeight: 700, color: C.kirmizi, marginTop: 14 }}>{host}</div>
@@ -120,5 +126,48 @@ export async function treeStoryImage(tree: Tree, kinds: number[], total: number,
       </div>
     ),
     { width: 1080, height: 1920, fonts: await loadFonts(), headers: CACHE },
+  )
+}
+
+// Yılın mesajı: sahibin seçtiği herkese açık tek mesaj, süsüyle birlikte büyük bir kartta.
+export async function messageStoryImage(
+  tree: Tree,
+  message: { kind: number; authorName: string | null; body: string },
+  lang: Lang,
+) {
+  const t = dict(lang)
+  const host = new URL(siteUrl()).host
+  const groundY = 1500
+  const ornament = svgSrc(
+    toSvgString(h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '-20 -3 40 42', width: 220, height: 231 }, ornamentNodes(message.kind))),
+  )
+  const length = [...message.body].length
+  const size = length > 220 ? 38 : length > 120 ? 46 : 56
+  return new ImageResponse(
+    (
+      <div style={{ width: '100%', height: '100%', display: 'flex', position: 'relative', fontFamily: FONT }}>
+        <img src={svgSrc(sceneSvg(1080, 1920, groundY))} width={1080} height={1920} style={{ position: 'absolute', top: 0, left: 0 }} />
+        <div style={{ position: 'absolute', top: 230, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', color: C.altin }}>
+          <div style={{ fontSize: 40, fontWeight: 700 }}>{t.story.messageOf(revealYear(tree.revealAt))}</div>
+          <div style={{ fontSize: 34, fontWeight: 500, color: C.yazi, marginTop: 10, paddingLeft: 90, paddingRight: 90, textAlign: 'center', wordBreak: 'break-word' }}>{tree.name}</div>
+        </div>
+        <img src={ornament} width={220} height={231} style={{ position: 'absolute', left: 430, top: 400 }} />
+        <div
+          style={{
+            position: 'absolute', top: 650, left: 90, right: 90, display: 'flex', flexDirection: 'column',
+            padding: '56px 60px', borderRadius: 36, background: '#FFFDF7', color: C.koyu,
+            boxShadow: '0 20px 60px rgba(0,0,0,0.35)',
+          }}
+        >
+          <div style={{ fontSize: size, fontWeight: 500, lineHeight: 1.32, wordBreak: 'break-word' }}>{message.body}</div>
+          <div style={{ fontSize: 36, fontWeight: 700, color: C.kirmizi, marginTop: 34 }}>{message.authorName ?? t.card.anonymous}</div>
+        </div>
+        <div style={{ position: 'absolute', top: 1620, left: 110, right: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', color: C.koyu }}>
+          <div style={{ fontSize: 34, fontWeight: 500, lineHeight: 1.35, textAlign: 'center' }}>{t.story.promo}</div>
+          <div style={{ fontSize: 40, fontWeight: 700, color: C.kirmizi, marginTop: 14 }}>{host}</div>
+        </div>
+      </div>
+    ),
+    { width: 1080, height: 1920, fonts: await loadFonts(), headers: { 'Cache-Control': 'private, no-store' } },
   )
 }

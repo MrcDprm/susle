@@ -45,7 +45,10 @@ export function Snow() {
       canvas.width = Math.round(w * dpr)
       canvas.height = Math.round(h * dpr)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      const target = Math.min(140, Math.round((w * h) / 7000))
+      // Kar yoğunluğu ağacın ayarından gelir: html data-snow 1 yoğun, 2 kar yok.
+      const mode = document.documentElement.dataset.snow
+      const factor = mode === '1' ? 2.2 : mode === '2' ? 0 : 1
+      const target = Math.min(300, Math.round(((w * h) / 7000) * factor))
       flakes = flakes.filter((f) => f.life === undefined).slice(0, target)
       while (flakes.length < target) flakes.push(spawn())
     }
@@ -98,11 +101,14 @@ export function Snow() {
     resize()
     raf = requestAnimationFrame(frame)
     window.addEventListener('resize', resize)
+    const observer = new MutationObserver(resize)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-snow'] })
     window.addEventListener(PUFF_EVENT, onPuff)
     document.addEventListener('visibilitychange', onVisibility)
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', resize)
+      observer.disconnect()
       window.removeEventListener(PUFF_EVENT, onPuff)
       document.removeEventListener('visibilitychange', onVisibility)
     }

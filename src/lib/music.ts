@@ -1,41 +1,101 @@
-// Müzik kutusu: Jingle Bells nakaratı, Web Audio ile çan tınısında çalınır.
-// Beste 1857 tarihli ve kamu malı; ses dosyası yok, notalar kodda üretilir.
+// Müzik kutusu: üç yılbaşı ezgisi, Web Audio ile çan tınısında çalınır. Ağacın sahibi birini seçer.
+// Üçü de kamu malı: Jingle Bells 1857, We Wish You a Merry Christmas ve Deck the Halls geleneksel.
+// Ses dosyası yok, notalar kodda üretilir.
 
 type Note = [midi: number | null, beats: number]
 
-const E = 76, F = 77, G = 79, C5 = 72, D = 74
-const MELODY: Note[] = [
-  [E, 1], [E, 1], [E, 2], [E, 1], [E, 1], [E, 2], [E, 1], [G, 1], [C5, 1.5], [D, 0.5], [E, 4],
-  [F, 1], [F, 1], [F, 1.5], [F, 0.5], [F, 1], [E, 1], [E, 1], [E, 0.5], [E, 0.5], [E, 1], [D, 1], [D, 1], [E, 1], [D, 2], [G, 2],
-  [E, 1], [E, 1], [E, 2], [E, 1], [E, 1], [E, 2], [E, 1], [G, 1], [C5, 1.5], [D, 0.5], [E, 4],
-  [F, 1], [F, 1], [F, 1.5], [F, 0.5], [F, 1], [E, 1], [E, 1], [E, 0.5], [E, 0.5], [G, 1], [G, 1], [F, 1], [D, 1], [C5, 4],
-  [null, 4],
-]
-// Her ölçünün ilk ve üçüncü vuruşunda alçak bir eşlik notası.
-const BASS = [48, 48, 48, 48, 53, 48, 50, 43, 48, 48, 48, 48, 53, 48, 43, 48, null]
+type Song = {
+  bpm: number
+  beatsPerBar: number
+  // Ezgi ilk ölçüden önce başlıyorsa önden gelen vuruş sayısı.
+  pickup: number
+  melody: Note[]
+  // Her ölçünün kök notası; null o ölçüde eşlik yok demektir.
+  bass: (number | null)[]
+}
 
-const BEAT = 60 / 118
-const LOOP_BEATS = MELODY.reduce((sum, [, b]) => sum + b, 0)
+const E = 76, F = 77, G = 79, C5 = 72, D = 74, A = 81, B = 83, C6 = 84, Fs = 78
+
+const SONGS: Song[] = [
+  {
+    bpm: 118,
+    beatsPerBar: 4,
+    pickup: 0,
+    melody: [
+      [E, 1], [E, 1], [E, 2], [E, 1], [E, 1], [E, 2], [E, 1], [G, 1], [C5, 1.5], [D, 0.5], [E, 4],
+      [F, 1], [F, 1], [F, 1.5], [F, 0.5], [F, 1], [E, 1], [E, 1], [E, 0.5], [E, 0.5], [E, 1], [D, 1], [D, 1], [E, 1], [D, 2], [G, 2],
+      [E, 1], [E, 1], [E, 2], [E, 1], [E, 1], [E, 2], [E, 1], [G, 1], [C5, 1.5], [D, 0.5], [E, 4],
+      [F, 1], [F, 1], [F, 1.5], [F, 0.5], [F, 1], [E, 1], [E, 1], [E, 0.5], [E, 0.5], [G, 1], [G, 1], [F, 1], [D, 1], [C5, 4],
+      [null, 4],
+    ],
+    bass: [48, 48, 48, 48, 53, 48, 50, 43, 48, 48, 48, 48, 53, 48, 43, 48, null],
+  },
+  {
+    // We Wish You a Merry Christmas, 3/4, sol majör.
+    bpm: 132,
+    beatsPerBar: 3,
+    pickup: 1,
+    melody: [
+      [D, 1],
+      [G, 1], [G, 0.5], [A, 0.5], [G, 0.5], [Fs, 0.5],
+      [E, 1], [E, 1], [E, 1],
+      [A, 1], [A, 0.5], [B, 0.5], [A, 0.5], [G, 0.5],
+      [Fs, 1], [D, 1], [D, 1],
+      [B, 1], [B, 0.5], [C6, 0.5], [B, 0.5], [A, 0.5],
+      [G, 1], [E, 1], [D, 0.5], [D, 0.5],
+      [E, 1], [A, 1], [Fs, 1],
+      [G, 3],
+      [null, 2],
+    ],
+    bass: [43, 48, 45, 50, 47, 52, 48, 43, null],
+  },
+  {
+    // Deck the Halls, 4/4, do majör.
+    bpm: 120,
+    beatsPerBar: 4,
+    pickup: 0,
+    melody: [
+      [G, 1.5], [F, 0.5], [E, 1], [D, 1], [C5, 1], [D, 1], [E, 1], [C5, 1],
+      [D, 0.5], [E, 0.5], [F, 0.5], [D, 0.5], [E, 1.5], [D, 0.5], [C5, 1], [71, 1], [C5, 2],
+      [G, 1.5], [F, 0.5], [E, 1], [D, 1], [C5, 1], [D, 1], [E, 1], [C5, 1],
+      [D, 0.5], [E, 0.5], [F, 0.5], [D, 0.5], [E, 1.5], [D, 0.5], [C5, 1], [71, 1], [C5, 2],
+      [D, 1.5], [E, 0.5], [F, 1], [D, 1], [E, 1.5], [F, 0.5], [G, 1], [D, 1],
+      [E, 0.5], [Fs, 0.5], [G, 1], [A, 0.5], [B, 0.5], [C6, 1], [B, 1], [A, 1], [G, 2],
+      [G, 1.5], [F, 0.5], [E, 1], [D, 1], [C5, 1], [D, 1], [E, 1], [C5, 1],
+      [A, 0.5], [A, 0.5], [A, 0.5], [A, 0.5], [G, 1.5], [F, 0.5], [E, 1], [D, 1], [C5, 2],
+      [null, 4],
+    ],
+    bass: [48, 48, 43, 48, 48, 48, 43, 48, 43, 43, 50, 43, 48, 48, 53, 48, null],
+  },
+]
+
 const PENTATONIC = [79, 81, 84, 86, 88, 91]
 
 type Event = { at: number; midi: number; volume: number; length: number }
 
 // Bir döngünün bütün notaları, döngü başından saniye cinsinden.
-const EVENTS: Event[] = (() => {
+function eventsOf(song: Song): { events: Event[]; loop: number } {
+  const beat = 60 / song.bpm
   const list: Event[] = []
   let t = 0
-  for (const [midi, beats] of MELODY) {
-    if (midi !== null) list.push({ at: t * BEAT, midi, volume: 0.55, length: Math.min(1.6, beats * BEAT + 0.6) })
+  for (const [midi, beats] of song.melody) {
+    if (midi !== null) list.push({ at: t * beat, midi, volume: 0.55, length: Math.min(1.6, beats * beat + 0.6) })
     t += beats
   }
-  BASS.forEach((midi, bar) => {
+  song.bass.forEach((midi, bar) => {
     if (midi === null) return
-    list.push({ at: bar * 4 * BEAT, midi, volume: 0.22, length: 1.1 })
-    list.push({ at: (bar * 4 + 2) * BEAT, midi: midi + 7, volume: 0.18, length: 1.1 })
+    const start = song.pickup + bar * song.beatsPerBar
+    list.push({ at: start * beat, midi, volume: 0.22, length: 1.1 })
+    const offsets = song.beatsPerBar === 3 ? [1, 2] : [2]
+    for (const o of offsets) list.push({ at: (start + o) * beat, midi: midi + 7, volume: 0.16, length: 1 })
   })
-  return list.sort((x, y) => x.at - y.at)
-})()
-const LOOP = LOOP_BEATS * BEAT
+  return { events: list.sort((x, y) => x.at - y.at), loop: t * beat }
+}
+
+let current = eventsOf(SONGS[0])
+let songIndex = 0
+let EVENTS = current.events
+let LOOP = current.loop
 
 let ctx: AudioContext | null = null
 let master: GainNode | null = null
@@ -116,6 +176,20 @@ function schedule() {
       cursor = 0
       loopStart += LOOP
     }
+  }
+}
+
+// Ağacın müziği değişince çalan ezgi baştan başlar.
+export function setSong(index: number): void {
+  const next = SONGS[index] ? index : 0
+  if (next === songIndex) return
+  songIndex = next
+  current = eventsOf(SONGS[next])
+  EVENTS = current.events
+  LOOP = current.loop
+  if (playing && ctx) {
+    cursor = 0
+    loopStart = ctx.currentTime + 0.1
   }
 }
 

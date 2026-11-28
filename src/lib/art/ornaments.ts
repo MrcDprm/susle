@@ -101,6 +101,72 @@ const DRAW: (() => SvgNode[])[] = [
     h('rect', { x: -13, y: 18.5, width: 26, height: 5, fill: C.kirmizi }),
     h('path', { d: 'M0 10 C-4 3 -11 4 -9 8 C-7.5 10.5 -3 10.5 0 10 C3 10.5 7.5 10.5 9 8 C11 4 4 3 0 10 Z', fill: C.kirmizi }),
   ],
+  // 12 Milli Piyango bileti
+  () => [
+    g({ transform: 'rotate(-8 0 20)' }, [
+      h('path', { d: 'M-14 6 L14 6 L14 13 A3 3 0 0 0 14 19 L14 34 L-14 34 L-14 19 A3 3 0 0 0 -14 13 Z', fill: '#FFF6DC' }),
+      h('rect', { x: -14, y: 6, width: 28, height: 8, fill: C.kirmizi }),
+      h('path', { d: 'M-9 20 L9 20 M-9 25 L4 25', stroke: C.koyu, 'stroke-width': 1.6, 'stroke-linecap': 'round', opacity: 0.55 }),
+      h('circle', { cx: 8, cy: 29, r: 2.2, fill: C.altin }),
+    ]),
+  ],
+  // 13 Kestane
+  () => [
+    h('path', { d: 'M0 6 C10 6 15 16 15 24 C15 31 8 35 0 35 C-8 35 -15 31 -15 24 C-15 16 -10 6 0 6 Z', fill: '#7A3E1E' }),
+    h('path', { d: 'M-15 26 C-8 30 8 30 15 26 C15 31 8 35 0 35 C-8 35 -15 31 -15 26 Z', fill: '#C69A6B' }),
+    h('ellipse', { cx: -5, cy: 14, rx: 3.5, ry: 2.2, transform: 'rotate(-35 -5 14)', ...SHINE }),
+  ],
+  // 14 Lokum
+  () => [
+    h('path', { d: 'M-12 12 L4 8 L16 14 L0 18 Z', fill: '#F7B6C4' }),
+    h('path', { d: 'M-12 12 L0 18 L0 34 L-12 28 Z', fill: C.pembe }),
+    h('path', { d: 'M0 18 L16 14 L16 30 L0 34 Z', fill: '#D9586C' }),
+    h('circle', { cx: -6, cy: 21, r: 1.1, fill: C.kar }),
+    h('circle', { cx: -3, cy: 27, r: 1.1, fill: C.kar }),
+    h('circle', { cx: 6, cy: 22, r: 1.1, fill: C.kar }),
+    h('circle', { cx: 10, cy: 27, r: 1.1, fill: C.kar }),
+    h('circle', { cx: 3, cy: 12, r: 1.1, fill: C.kar }),
+  ],
+  // 15 Tombala kartı
+  () => [
+    h('rect', { x: -14, y: 6, width: 28, height: 28, rx: 3, fill: C.kar }),
+    h('path', { d: 'M-14 15.3 L14 15.3 M-14 24.6 L14 24.6 M-4.7 6 L-4.7 34 M4.7 6 L4.7 34', stroke: '#B9C3D6', 'stroke-width': 1 }),
+    h('circle', { cx: -9.3, cy: 10.6, r: 3.2, fill: C.kirmizi }),
+    h('circle', { cx: 0, cy: 20, r: 3.2, fill: C.kirmizi }),
+    h('circle', { cx: 9.3, cy: 29.3, r: 3.2, fill: C.kirmizi }),
+  ],
+  // 16 Simit
+  () => [
+    h('circle', { cx: 0, cy: 21, r: 13, fill: 'none', stroke: '#B8742F', 'stroke-width': 8 }),
+    h('circle', { cx: 0, cy: 21, r: 13, fill: 'none', stroke: '#D9954A', 'stroke-width': 3.5, 'stroke-dasharray': '6 4' }),
+    ...[0, 45, 90, 135, 180, 225, 270, 315].map((deg) =>
+      h('ellipse', { cx: 0, cy: 8, rx: 1.3, ry: 0.8, fill: '#FFF1C9', transform: `rotate(${deg} 0 21)` }),
+    ),
+  ],
+  // 17 Salep fincanı
+  () => [
+    h('path', { d: 'M-4 6 C-7 2 -2 0 -4 -3 M3 6 C0 2 5 0 3 -3', stroke: C.kar, 'stroke-width': 1.6, fill: 'none', 'stroke-linecap': 'round', opacity: 0.7 }),
+    h('path', { d: 'M-13 12 L13 12 L10 32 L-10 32 Z', fill: C.kar }),
+    h('path', { d: 'M13 16 C20 16 20 26 11 26', fill: 'none', stroke: C.kar, 'stroke-width': 3 }),
+    h('ellipse', { cx: 0, cy: 12.5, rx: 12, ry: 2.6, fill: '#E9D3B0' }),
+    h('circle', { cx: -2, cy: 12.4, r: 1.2, fill: '#9C6A37' }),
+    h('circle', { cx: 4, cy: 12.6, r: 1, fill: '#9C6A37' }),
+    h('rect', { x: -13, y: 20, width: 24, height: 4, fill: C.kirmizi, opacity: 0.85 }),
+  ],
+  // 18 Kartopu
+  () => [
+    h('circle', { cx: 0, cy: 21, r: 14.5, fill: C.kar }),
+    h('path', { d: 'M8 10 A14.5 14.5 0 0 1 0 35.5 A14.5 14.5 0 0 1 -13 28 C-4 31 8 26 8 10 Z', fill: '#C9D6EA' }),
+    h('circle', { cx: -5, cy: 16, r: 1.5, fill: '#DCE6F3' }),
+    h('circle', { cx: 4, cy: 24, r: 1.2, fill: '#DCE6F3' }),
+  ],
+  // 19 Fiyonk
+  () => [
+    h('path', { d: 'M0 16 C-9 4 -18 7 -16 15 C-14 22 -6 21 0 16 Z', fill: C.kirmizi }),
+    h('path', { d: 'M0 16 C9 4 18 7 16 15 C14 22 6 21 0 16 Z', fill: C.kirmizi }),
+    h('path', { d: 'M-2 19 L-9 34 L-4 32 L-1 36 L0 20 Z M2 19 L9 34 L4 32 L1 36 L0 20 Z', fill: C.kirmiziKoyu }),
+    h('circle', { cx: 0, cy: 16.5, r: 4, fill: C.kirmiziKoyu }),
+  ],
 ]
 
 export const ORNAMENT_COUNT = DRAW.length
