@@ -8,24 +8,49 @@ const STARS: [number, number, number][] = [
   [74, 34, 0.3], [53, 31, 0.25], [17, 13, 0.3], [81, 14, 0.3],
 ]
 
-// Arka plan: gece gökyüzü, yanıp sönen yıldızlar, ay, ara sıra kayan bir yıldız ve kar.
-// Ağacın gökyüzü seçimi html data-sky ile gelir: 1 kuzey ışıkları, 2 alacakaranlık.
-export function Sky() {
+// Havai fişekler: yerleri, renkleri ve patlama zamanları CSS'te, f0-f4 sınıflarında.
+const FIREWORKS = [0, 1, 2, 3, 4]
+
+// Gökyüzünün bütün katmanları. Hangisinin görüneceğini data-sky ya da sky-N sınıfı seçer:
+// 0 gece, 1 kuzey ışıkları, 2 alacakaranlık, 3 Samanyolu, 4 kar bulutları, 5 havai fişek.
+export function SkyLayers() {
   return (
-    <div className="sky" aria-hidden="true">
+    <>
+      <div className="twilight" />
+      <div className="overcast" />
       <svg className="stars" viewBox="0 0 100 50" preserveAspectRatio="xMidYMin slice">
         {STARS.map(([x, y, r], i) => (
           <circle key={i} cx={x} cy={y} r={r} className={`star s${i % 5}`} />
         ))}
       </svg>
-      <div className="twilight" />
+      <div className="milky" />
       <div className="aurora">
         <span />
         <span />
         <span />
       </div>
       <div className="moon" />
+      <div className="clouds">
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className="fireworks">
+        {FIREWORKS.map((i) => (
+          <span key={i} className={`fw f${i}`} />
+        ))}
+      </div>
       <div className="shooting-star" />
+    </>
+  )
+}
+
+// Arka plan: gece gökyüzü, yanıp sönen yıldızlar, ay, ara sıra kayan bir yıldız ve kar.
+export function Sky() {
+  return (
+    <div className="sky" aria-hidden="true">
+      <SkyLayers />
       <Snow />
     </div>
   )

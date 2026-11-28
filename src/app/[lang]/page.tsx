@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { CreateTree } from '@/components/CreateTree'
 import { Header } from '@/components/Header'
 import { NewBadge } from '@/components/NewBadge'
-import { Ground } from '@/components/scene/Ground'
+import { Backdrop, Ground } from '@/components/scene/Ground'
 import { TreeView } from '@/components/TreeView'
 import { getDb } from '@/lib/db/client'
 import { dict, isLang, localePath } from '@/lib/i18n'
@@ -69,6 +69,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
               ornaments={DEMO.map((kind, i) => ({ id: `d${i}`, kind, label: t.ornaments[kind] }))}
             />
           </div>
+          <Backdrop />
           <Ground />
           <div className="bar">
             <div className="bar-buttons">

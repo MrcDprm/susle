@@ -17,7 +17,7 @@ type StyleDef = {
   wire: string
 }
 
-// Altı ağaç: kat sayısı, genişlik, dal ucu sarkması ve renkleri farklı.
+// Dokuz ağaç: kat sayısı, genişlik, dal ucu sarkması ve renkleri farklı.
 const STYLES: StyleDef[] = [
   { base: '#2F6B45', dark: '#1C432C', shadow: 0.16, tiers: 4, width: 1, droop: 13, snow: 'none', wire: '#13261A' },
   { base: '#2F6B45', dark: '#1C432C', shadow: 0.16, tiers: 4, width: 1, droop: 13, snow: 'caps', wire: '#13261A' },
@@ -25,6 +25,9 @@ const STYLES: StyleDef[] = [
   { base: '#245A3C', dark: '#14341F', shadow: 0.18, tiers: 5, width: 0.95, droop: 19, snow: 'none', wire: '#0E2016' },
   { base: '#93ACA6', dark: '#5D7871', shadow: 0.14, tiers: 5, width: 0.92, droop: 12, snow: 'frost', wire: '#33433F' },
   { base: '#F3F6FA', dark: '#C3CDD9', shadow: 0.1, tiers: 4, width: 1, droop: 13, snow: 'none', wire: '#8C97A6' },
+  { base: '#4F7F8E', dark: '#2F5361', shadow: 0.16, tiers: 5, width: 0.94, droop: 16, snow: 'frost', wire: '#1B323B' },
+  { base: '#D9B45A', dark: '#A8822F', shadow: 0.14, tiers: 4, width: 0.98, droop: 12, snow: 'none', wire: '#6B5320' },
+  { base: '#2C6440', dark: '#183D27', shadow: 0.16, tiers: 7, width: 0.76, droop: 8, snow: 'caps', wire: '#0E2016' },
 ]
 
 export const TREE_STYLE_COUNT = STYLES.length

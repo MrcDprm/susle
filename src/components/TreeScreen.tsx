@@ -16,7 +16,7 @@ import { Dialog } from './Dialog'
 import { HangForm } from './HangForm'
 import { useInApp } from './OpenInBrowser'
 import { OwnerPanel } from './OwnerPanel'
-import { Ground } from './scene/Ground'
+import { Backdrop, Ground } from './scene/Ground'
 import { puffAt } from './scene/Snow'
 import { applySceneLook, clearSceneLook } from './sceneLook'
 import { Reminder, ShareTools } from './ShareTools'
@@ -220,6 +220,7 @@ export function TreeScreen(p: ScreenProps) {
           />
         </div>
 
+        <Backdrop scene={p.tree.look.scene} />
         <Ground scene={p.tree.look.scene} />
 
         <div className="bar">
@@ -319,7 +320,6 @@ export function TreeScreen(p: ScreenProps) {
             revealAt={p.tree.revealAt}
             onDone={() => {
               setWelcomeOpen(false)
-              setCustomizeOpen(true)
               router.replace(localePath(p.lang, `/a/${p.tree.id}`), { scroll: false })
             }}
           />
@@ -327,8 +327,9 @@ export function TreeScreen(p: ScreenProps) {
       )}
 
       {p.owner && p.ownerUrl && (
-        <Dialog open={customizeOpen} onClose={() => setCustomizeOpen(false)} label={t.customize.title} className="customize-dialog">
-          <Customize
+        <Customize
+            open={customizeOpen}
+            title={p.tree.name}
             lang={p.lang}
             treeId={p.tree.id}
             style={p.tree.style}
@@ -339,7 +340,6 @@ export function TreeScreen(p: ScreenProps) {
             growth={growth}
             onClose={() => setCustomizeOpen(false)}
           />
-        </Dialog>
       )}
 
       <Dialog open={invite} onClose={() => setInvite(false)} label={t.invite.title}>

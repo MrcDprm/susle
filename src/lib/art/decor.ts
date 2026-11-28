@@ -1,5 +1,5 @@
 import { COLORS as C } from './palette'
-import { g, h, type SvgNode } from './node'
+import { g, h, type Attrs, type SvgNode } from './node'
 
 // Ağacı kişiselleştiren parçalar: tepe süsü, ışık renkleri, sim, saksı ve büyüme süslemeleri.
 // Hepsi 400x560 ağaç çerçevesine göre çizilir.
@@ -50,6 +50,68 @@ export function topper(kind: number): SvgNode {
           h('path', { d: 'M196 54 L186 80 L193 77 L198 82 L200 56 Z M204 54 L214 80 L207 77 L202 82 L200 56 Z', fill: C.kirmiziKoyu }),
           h('circle', { cx: 200, cy: 51, r: 6, fill: C.kirmiziKoyu }),
         ]
+      case 6: // kuyruklu yıldız
+        return [
+          h('path', { d: 'M196 54 Q160 70 120 104 Q170 78 204 62 Z', fill: '#FFE9A8', opacity: 0.55 }),
+          h('path', { d: 'M194 50 Q168 58 140 80 Q176 64 200 58 Z', fill: '#FFF6D6', opacity: 0.7 }),
+          h('path', { d: star(206, 46, 22, 10), fill: C.altin }),
+          h('path', { d: star(206, 46, 10, 4.5), fill: '#FFF6D6' }),
+        ]
+      case 7: // yılbaşı saati, akrep ve yelkovan on ikide
+        return [
+          h('circle', { cx: 200, cy: 50, r: 27, fill: C.altinKoyu }),
+          h('circle', { cx: 200, cy: 50, r: 22, fill: '#FFFBEF' }),
+          ...Array.from({ length: 12 }, (_, i) =>
+            h('rect', { x: 199, y: 30, width: 2, height: i % 3 === 0 ? 5 : 3, fill: C.koyu, transform: `rotate(${i * 30} 200 50)` }),
+          ),
+          h('rect', { x: 198.5, y: 33, width: 3, height: 18, rx: 1.5, fill: C.koyu }),
+          h('rect', { x: 199, y: 38, width: 2, height: 13, rx: 1, fill: C.kirmizi, transform: 'rotate(4 200 50)' }),
+          h('circle', { cx: 200, cy: 50, r: 2.5, fill: C.koyu }),
+          h('rect', { x: 196, y: 19, width: 8, height: 5, rx: 2, fill: C.altinKoyu }),
+        ]
+      case 8: // kar küresi
+        return [
+          h('path', { d: 'M180 72 L220 72 L224 82 L176 82 Z', fill: '#8A5A35' }),
+          h('circle', { cx: 200, cy: 50, r: 26, fill: '#BFE3F5', opacity: 0.55 }),
+          h('path', { d: 'M180 64 Q200 58 220 64 L218 70 L182 70 Z', fill: C.kar }),
+          h('path', { d: 'M200 38 L210 58 L190 58 Z', fill: C.cam }),
+          h('path', { d: 'M200 32 L207 46 L193 46 Z', fill: C.cam }),
+          h('circle', { cx: 188, cy: 40, r: 1.4, fill: '#fff' }),
+          h('circle', { cx: 213, cy: 44, r: 1.2, fill: '#fff' }),
+          h('circle', { cx: 196, cy: 30, r: 1, fill: '#fff' }),
+          h('circle', { cx: 216, cy: 34, r: 1.3, fill: '#fff' }),
+          h('path', { d: 'M184 36 A20 20 0 0 1 198 28', stroke: '#fff', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', opacity: 0.7 }),
+        ]
+      case 9: // altın çan
+        return [
+          h('path', { d: 'M200 24 C186 24 180 36 180 50 C180 62 174 68 170 72 L230 72 C226 68 220 62 220 50 C220 36 214 24 200 24 Z', fill: C.altin }),
+          h('rect', { x: 168, y: 70, width: 64, height: 6, rx: 3, fill: C.altinKoyu }),
+          h('circle', { cx: 200, cy: 80, r: 5, fill: C.altinKoyu }),
+          h('path', { d: 'M188 34 C184 40 184 50 184 56', stroke: '#FFF1C4', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', opacity: 0.8 }),
+          h('path', { d: 'M184 22 C192 16 208 16 216 22', stroke: C.kirmizi, 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round' }),
+        ]
+      case 10: // çam kozalağı
+        return [
+          h('ellipse', { cx: 200, cy: 52, rx: 17, ry: 27, fill: '#7A4A26' }),
+          ...[34, 42, 50, 58, 66].flatMap((y, r) =>
+            [-1, 0, 1].map((k) =>
+              h('path', {
+                d: `M${200 + k * 9 - 6} ${y} Q${200 + k * 9} ${y + 8} ${200 + k * 9 + 6} ${y} Z`,
+                fill: r % 2 === 0 ? '#A0673A' : '#8A5530',
+              }),
+            ),
+          ),
+          h('path', { d: 'M190 26 Q200 18 210 26 Q204 30 200 28 Q196 30 190 26 Z', fill: C.kar }),
+        ]
+      case 11: // hediye paketi
+        return [
+          h('rect', { x: 177, y: 38, width: 46, height: 38, rx: 3, fill: C.lacivert }),
+          h('rect', { x: 173, y: 32, width: 54, height: 11, rx: 3, fill: '#2E5DAA' }),
+          h('rect', { x: 196, y: 32, width: 8, height: 44, fill: C.altin }),
+          h('path', { d: 'M200 32 C190 18 176 22 182 30 C186 34 194 33 200 32 Z M200 32 C210 18 224 22 218 30 C214 34 206 33 200 32 Z', fill: C.altin }),
+          h('circle', { cx: 186, cy: 56, r: 2, fill: '#fff', opacity: 0.6 }),
+          h('circle', { cx: 214, cy: 64, r: 2, fill: '#fff', opacity: 0.6 }),
+        ]
       default: // yıldız
         return [h('path', { d: star(200, 50, 27, 12), fill: C.altin })]
     }
@@ -65,22 +127,66 @@ export const LIGHT_SETS: string[][] = [
   ['#BDE6FF', '#8EC5D6', '#FFFFFF'],
   [C.kirmizi, '#3FBF6A'],
   [],
+  ['#C77DFF', '#FF8FC7', '#9FB8FF'],
+  ['#FF5A5A', '#FFB347', '#FFF06A', '#6BE38B', '#5AB4FF', '#B57BFF'],
+  [C.kirmizi, C.altin, '#FFF4DC'],
+  ['#FFE7B0', '#9FE3FF'],
 ]
 
 // Katın üst kısmından sarkan sim ya da kurdele.
 // clip: katın kırpma yolu; sim katın dışına taşmaz.
+const BEADS = ['#D7263D', '#F2C14E', '#2E5DAA', '#3FBF6A', '#E8798A']
+
 export function ribbon(kind: number, y0: number, hw: number, clip: string): SvgNode | null {
   if (kind === 0) return null
   const w = hw * 0.42
-  const d = `M${(200 - w).toFixed(1)} ${(y0 - 6).toFixed(1)} Q200 ${(y0 + 26).toFixed(1)} ${(200 + w).toFixed(1)} ${(y0 + 8).toFixed(1)}`
+  const p0 = [200 - w, y0 - 6]
+  const p1 = [200, y0 + 26]
+  const p2 = [200 + w, y0 + 8]
+  const d = `M${p0[0].toFixed(1)} ${p0[1].toFixed(1)} Q${p1[0]} ${p1[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`
+  const attrs: Attrs = clip ? { class: 'ribbon', 'clip-path': clip } : { class: 'ribbon' }
+  // Boncuk dizileri: eğri üzerinde eşit aralıklı noktalar.
+  const along = (n: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const t = (i + 0.5) / n
+      return [(1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0], (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1]]
+    })
+  if (kind === 4 || kind === 5) {
+    const pts = along(Math.max(8, Math.round(w / 5)))
+    return g(attrs, [
+      h('path', { d, fill: 'none', stroke: '#C9D3E2', 'stroke-width': 0.8, opacity: 0.7 }),
+      ...pts.map(([x, y], i) =>
+        h('circle', {
+          cx: x.toFixed(1),
+          cy: y.toFixed(1),
+          r: kind === 4 ? 2.6 : 3,
+          fill: kind === 4 ? '#FBF7EE' : BEADS[i % BEADS.length],
+          stroke: kind === 4 ? '#D9CFBE' : 'none',
+          'stroke-width': 0.6,
+        }),
+      ),
+    ])
+  }
+  if (kind === 6) {
+    return g(attrs, [
+      h('path', { d, fill: 'none', stroke: '#FFFFFF', 'stroke-width': 6, 'stroke-linecap': 'round' }),
+      h('path', { d, fill: 'none', stroke: C.kirmizi, 'stroke-width': 6, 'stroke-dasharray': '5 5' }),
+    ])
+  }
+  if (kind === 7) {
+    return g(attrs, [
+      h('path', { d, fill: 'none', stroke: '#2E5DAA', 'stroke-width': 5.5, 'stroke-linecap': 'round' }),
+      h('path', { d, fill: 'none', stroke: '#8FB3F0', 'stroke-width': 1.4, 'stroke-linecap': 'round', transform: 'translate(0 -1.5)' }),
+    ])
+  }
   if (kind === 3) {
-    return g({ class: 'ribbon', 'clip-path': clip }, [
+    return g(attrs, [
       h('path', { d, fill: 'none', stroke: C.kirmizi, 'stroke-width': 5.5, 'stroke-linecap': 'round' }),
       h('path', { d, fill: 'none', stroke: '#F06272', 'stroke-width': 1.6, 'stroke-linecap': 'round', transform: 'translate(0 -1.5)' }),
     ])
   }
   const color = kind === 1 ? C.altin : '#E6EBF2'
-  return g({ class: 'ribbon', 'clip-path': clip }, [
+  return g(attrs, [
     h('path', { d, fill: 'none', stroke: color, 'stroke-width': 5, 'stroke-dasharray': '1.5 2.6', 'stroke-linecap': 'round' }),
     h('path', { d, fill: 'none', stroke: color, 'stroke-width': 1.2, opacity: 0.8 }),
   ])
@@ -113,6 +219,45 @@ export function base(kind: number): SvgNode[] {
         h('ellipse', { cx: 200, cy: 506, rx: 40, ry: 8, fill: '#C69A6B' }),
         h('ellipse', { cx: 200, cy: 506, rx: 26, ry: 5, fill: 'none', stroke: '#A27648', 'stroke-width': 1.5 }),
         h('path', { d: 'M158 504 Q172 494 186 502 Q200 492 214 501 Q228 494 242 504 Q228 509 200 509 Q172 509 158 504 Z', fill: C.kar }),
+      ]
+    case 4: // çini saksı
+      return [
+        h('path', { d: 'M150 502 L250 502 L240 548 L160 548 Z', fill: '#F7F3EA' }),
+        h('path', { d: 'M152 512 L248 512 M158 540 L242 540', stroke: '#1F5FA8', 'stroke-width': 3 }),
+        ...[170, 200, 230].map((x) =>
+          g({ transform: `translate(${x} 526)` }, [
+            h('path', { d: 'M0 -9 C5 -4 5 4 0 9 C-5 4 -5 -4 0 -9 Z', fill: '#1F5FA8' }),
+            h('path', { d: 'M-9 0 C-4 5 4 5 9 0 C4 -5 -4 -5 -9 0 Z', fill: '#2F8FA8', opacity: 0.8 }),
+            h('circle', { r: 2.4, fill: C.kirmizi }),
+          ]),
+        ),
+        h('rect', { x: 144, y: 496, width: 112, height: 12, rx: 4, fill: '#1F5FA8' }),
+      ]
+    case 5: // bakır kova
+      return [
+        h('path', { d: 'M150 506 C130 506 130 530 150 530 M250 506 C270 506 270 530 250 530', stroke: '#8E4C27', 'stroke-width': 3, fill: 'none' }),
+        h('path', { d: 'M152 500 L248 500 L240 548 L160 548 Z', fill: '#B8683A' }),
+        h('path', { d: 'M152 500 L248 500 L246 512 L154 512 Z', fill: '#CF8150' }),
+        h('path', { d: 'M168 504 L174 544', stroke: '#E8A577', 'stroke-width': 5, opacity: 0.55, 'stroke-linecap': 'round' }),
+        h('path', { d: 'M156 522 L244 522 M158 536 L242 536', stroke: '#8E4C27', 'stroke-width': 1.6 }),
+      ]
+    case 6: // hediye kutusu
+      return [
+        h('rect', { x: 150, y: 500, width: 100, height: 48, rx: 3, fill: '#2E8B57' }),
+        h('rect', { x: 146, y: 494, width: 108, height: 12, rx: 3, fill: '#37A266' }),
+        h('rect', { x: 194, y: 494, width: 12, height: 54, fill: C.kirmizi }),
+        h('rect', { x: 150, y: 520, width: 100, height: 8, fill: C.kirmizi, opacity: 0.9 }),
+        h('circle', { cx: 168, cy: 538, r: 2.4, fill: '#FFF4C8' }),
+        h('circle', { cx: 232, cy: 512, r: 2.4, fill: '#FFF4C8' }),
+      ]
+    case 7: // kızak
+      return [
+        h('rect', { x: 146, y: 500, width: 108, height: 9, rx: 3, fill: '#A8743F' }),
+        h('rect', { x: 146, y: 512, width: 108, height: 9, rx: 3, fill: '#94622F' }),
+        h('rect', { x: 146, y: 524, width: 108, height: 9, rx: 3, fill: '#A8743F' }),
+        h('path', { d: 'M156 533 L156 544 M244 533 L244 544', stroke: C.kirmiziKoyu, 'stroke-width': 4 }),
+        h('path', { d: 'M138 546 L250 546 C262 546 268 540 268 530', stroke: C.kirmizi, 'stroke-width': 4.5, fill: 'none', 'stroke-linecap': 'round' }),
+        h('path', { d: 'M148 500 Q170 492 200 497 Q230 492 252 500 Z', fill: C.kar }),
       ]
     default: // kırmızı saksı
       return [

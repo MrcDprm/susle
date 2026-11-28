@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { Db } from '@/lib/db/client'
 import { openLocalDb } from '@/lib/db/local'
-import { DEFAULT_LOOK, growthLevel, lookSchema, nextGrowth, normalizeLook } from '@/lib/look'
+import { DEFAULT_LOOK, growthLevel, LOOK_OPTIONS, lookSchema, nextGrowth, normalizeLook } from '@/lib/look'
+import { SONG_COUNT } from '@/lib/songs'
 import { createTree, getPublicMessage, getTree, hangOrnament, listOrnaments, lookOf, updateLook } from '@/lib/trees'
-import { customizeSchema } from '@/lib/validation'
+import { createTreeSchema, customizeSchema, TREE_STYLES } from '@/lib/validation'
 
 const created = new Date('2026-12-01T10:00:00Z')
 const before = new Date('2026-12-20T10:00:00Z')
@@ -12,7 +13,9 @@ const after = new Date('2027-01-01T09:00:00Z')
 describe('görünüm', () => {
   it('geçerli seçimleri kabul eder, sınır dışını ve bilinmeyen alanı reddeder', () => {
     expect(lookSchema.safeParse({ ...DEFAULT_LOOK, topper: 5, sky: 2 }).success).toBe(true)
-    expect(lookSchema.safeParse({ ...DEFAULT_LOOK, topper: 6 }).success).toBe(false)
+    expect(lookSchema.safeParse({ ...DEFAULT_LOOK, topper: LOOK_OPTIONS.topper - 1, music: SONG_COUNT - 1 }).success).toBe(true)
+    expect(lookSchema.safeParse({ ...DEFAULT_LOOK, topper: LOOK_OPTIONS.topper }).success).toBe(false)
+    expect(lookSchema.safeParse({ ...DEFAULT_LOOK, music: SONG_COUNT }).success).toBe(false)
     expect(lookSchema.safeParse({ ...DEFAULT_LOOK, lights: -1 }).success).toBe(false)
     expect(lookSchema.safeParse({ ...DEFAULT_LOOK, music: 1.5 }).success).toBe(false)
     expect(lookSchema.safeParse({ ...DEFAULT_LOOK, renk: 'kirmizi' }).success).toBe(false)
@@ -30,7 +33,7 @@ describe('görünüm', () => {
     expect(customizeSchema.parse({ ...base, note: '  2026’yı birlikte\n geçirdiklerime ' }).note).toBe('2026’yı birlikte geçirdiklerime')
     expect(customizeSchema.parse({ ...base, note: '   ' }).note).toBeNull()
     expect(customizeSchema.safeParse({ ...base, note: 'a'.repeat(81) }).success).toBe(false)
-    expect(customizeSchema.safeParse({ ...base, style: 6, note: '' }).success).toBe(false)
+    expect(customizeSchema.safeParse({ ...base, style: TREE_STYLES, note: '' }).success).toBe(false)
   })
 
   it('büyüme eşiklerini ve bir sonrakine kalan süsü hesaplar', () => {
@@ -60,6 +63,23 @@ describe('görünümün saklanması ve yılın mesajı', () => {
     expect(tree.style).toBe(3)
     expect(lookOf(tree)).toEqual(look)
     expect(tree.note).toBe('Sevdiklerime')
+  })
+
+  it('ağaç açılırken seçilen görünüm ve not baştan saklanır', async () => {
+    const look = { ...DEFAULT_LOOK, topper: 7, scene: 5, sky: 5, snow: 3, music: 11 }
+    const input = createTreeSchema.parse({ name: 'Yeni', style: 8, lang: 'tr', look, note: '  Herkese  ' })
+    const { id } = await createTree(db, input, created)
+    const tree = (await getTree(db, id))!
+    expect(tree.style).toBe(8)
+    expect(lookOf(tree)).toEqual(look)
+    expect(tree.note).toBe('Herkese')
+  })
+
+  it('ağaç açarken bozuk görünüm reddedilir, görünüm gönderilmezse varsayılan kullanılır', () => {
+    expect(createTreeSchema.safeParse({ name: 'x', style: 0, lang: 'tr', look: { ...DEFAULT_LOOK, scene: 99 } }).success).toBe(false)
+    expect(createTreeSchema.safeParse({ name: 'x', style: 0, lang: 'tr', look: { ...DEFAULT_LOOK, renk: 1 } }).success).toBe(false)
+    expect(createTreeSchema.safeParse({ name: 'x', style: 0, lang: 'tr', note: 'a'.repeat(81) }).success).toBe(false)
+    expect(createTreeSchema.parse({ name: 'x', style: 0, lang: 'tr' }).look).toBeUndefined()
   })
 
   it('yılın mesajı yalnızca açılıştan sonra ve herkese açık mesajdan seçilir', async () => {
