@@ -45,7 +45,8 @@ export default async function LangLayout({ children, params }: { children: React
   const { lang } = await params
   if (!isLang(lang)) notFound()
   return (
-    <html lang={lang} className={rubik.variable}>
+    // Ağaç sayfası gökyüzü ve kar seçimini React'tan önce html öğesine yazar; bu fark beklenen bir fark.
+    <html lang={lang} className={rubik.variable} suppressHydrationWarning>
       <body>
         <Sky />
         <InAppEscape />

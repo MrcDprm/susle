@@ -1012,7 +1012,7 @@ textarea:focus-visible {
   padding: 0;
   margin: 0 0 16px;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 6px;
 }
 
@@ -1133,7 +1133,8 @@ textarea:focus-visible {
 
 @media (max-width: 370px) {
   .picker {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
   }
 
   .chip {
@@ -1319,4 +1320,531 @@ textarea:focus-visible {
 
 .copy-btn {
   flex: none;
+}
+
+/* Gökyüzü seçenekleri: kuzey ışıkları ve alacakaranlık */
+.aurora,
+.twilight {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+
+html[data-sky='1'] .aurora,
+html[data-sky='2'] .twilight {
+  opacity: 1;
+}
+
+.aurora span {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 26svh;
+  top: 7svh;
+  border-radius: 50%;
+  filter: blur(28px);
+  background: linear-gradient(90deg, transparent, rgb(80 230 170 / 0.42), rgb(110 140 255 / 0.32), transparent);
+  animation: aurora 14s ease-in-out infinite alternate;
+}
+
+.aurora span:nth-child(2) {
+  top: 15svh;
+  height: 18svh;
+  background: linear-gradient(90deg, transparent, rgb(60 200 220 / 0.3), rgb(170 90 220 / 0.28), transparent);
+  animation-duration: 19s;
+  animation-delay: -6s;
+}
+
+.aurora span:nth-child(3) {
+  top: 2svh;
+  height: 12svh;
+  background: linear-gradient(90deg, transparent, rgb(120 255 190 / 0.25), transparent);
+  animation-duration: 23s;
+  animation-delay: -11s;
+}
+
+@keyframes aurora {
+  from { transform: translateX(-6%) skewY(-8deg) scaleY(0.9); opacity: 0.65; }
+  to { transform: translateX(6%) skewY(-3deg) scaleY(1.15); opacity: 1; }
+}
+
+.twilight {
+  background: linear-gradient(to bottom, rgb(40 24 80 / 0.15) 0%, rgb(120 64 130 / 0.55) 34%, rgb(236 128 96 / 0.7) 62%, rgb(250 176 110 / 0.75) 100%);
+}
+
+html[data-sky='2'] .stars {
+  opacity: 0.45;
+}
+
+html[data-sky='2'] .moon {
+  background: radial-gradient(circle at 36% 34%, #fff3e0 0 40%, #f5c9a0 72%);
+}
+
+/* Büyüyen ağaç: etrafta parlayan yıldızlar */
+.sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sparkle 2.4s ease-in-out infinite;
+}
+
+.sparkle.k1 { animation-delay: -0.6s; }
+.sparkle.k2 { animation-delay: -1.2s; animation-duration: 3s; }
+.sparkle.k3 { animation-delay: -1.8s; animation-duration: 2s; }
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(0.4); opacity: 0.2; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* Ağaç başlığının altı: sahibin notu ve büyüme ipucu */
+.tree-note {
+  margin: 6px auto 0;
+  max-width: 30ch;
+  font-size: 16px;
+  color: var(--yazi-soluk);
+}
+
+.growth-hint {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--yazi-soluk);
+}
+
+/* Bu tarayıcıdan asılan süs: altın halka */
+.orn .mine-ring {
+  fill: none;
+  stroke: var(--altin);
+  stroke-width: 2;
+  stroke-dasharray: 3 3;
+  opacity: 0;
+}
+
+.orn.is-mine .mine-ring {
+  opacity: 0.9;
+}
+
+.card-mine {
+  margin: 4px 0 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #fff6dc;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Dilek önerileri */
+.suggest {
+  margin: 0 0 8px;
+}
+
+.suggest-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.chip {
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.3;
+  text-align: left;
+  color: var(--koyu);
+  background: #fff;
+  border: 1px solid var(--cizgi);
+  border-radius: 12px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+.chip-more {
+  background: none;
+  color: var(--koyu-soluk);
+  text-decoration: underline;
+  border-style: dashed;
+}
+
+/* Ağacını süsle */
+.customize-dialog .dialog-body {
+  padding-top: 0;
+}
+
+.customize-dialog .dialog-body::before {
+  margin-top: 8px;
+}
+
+.customize-preview {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 0 -18px 12px;
+  padding: 10px 0 6px;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(var(--gok-ust), var(--gok-orta));
+  border-bottom: 1px solid rgb(0 0 0 / 0.08);
+}
+
+.customize-preview .tree {
+  height: min(30svh, 260px);
+  width: auto;
+}
+
+.opt-group {
+  margin-bottom: 14px;
+}
+
+.opt-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 2px 8px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+
+.opt-row::-webkit-scrollbar {
+  display: none;
+}
+
+.opt {
+  flex: none;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 76px;
+  padding: 8px 8px 6px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  background: linear-gradient(var(--gok-orta), var(--gok-alt));
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.opt-row.is-text .opt {
+  min-width: 0;
+  padding: 10px 14px;
+  background: #fff;
+  color: var(--koyu);
+  border-color: var(--cizgi);
+  font-size: 14px;
+}
+
+.opt.is-on {
+  border-color: var(--kirmizi);
+}
+
+.opt-row.is-text .opt.is-on {
+  border-color: var(--kirmizi);
+  background: #fde8eb;
+}
+
+.opt .mini-tree {
+  width: 44px;
+  height: 62px;
+}
+
+.opt-icon {
+  width: 46px;
+  height: 46px;
+}
+
+.opt-icon.wide {
+  width: 64px;
+  height: 32px;
+}
+
+.opt-name {
+  max-width: 88px;
+  text-align: center;
+}
+
+.opt-ribbon {
+  display: block;
+  width: 56px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgb(46 107 69);
+  position: relative;
+  overflow: hidden;
+}
+
+.opt-ribbon::after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: 12px;
+  height: 6px;
+  border-radius: 6px;
+  transform: rotate(-12deg);
+}
+
+.opt-ribbon.r1::after { background: repeating-linear-gradient(90deg, #f2c14e 0 3px, transparent 3px 5px); }
+.opt-ribbon.r2::after { background: repeating-linear-gradient(90deg, #e6ebf2 0 3px, transparent 3px 5px); }
+.opt-ribbon.r3::after { background: var(--kirmizi); }
+
+.customize-actions {
+  position: sticky;
+  bottom: 0;
+  margin: 0 -18px -20px;
+  padding: 12px 18px max(14px, env(safe-area-inset-bottom));
+  background: var(--kar);
+  border-top: 1px solid var(--cizgi);
+}
+
+/* Süs asınca davet kartı */
+.invite .reminder {
+  margin-bottom: 10px;
+}
+
+.invite-own {
+  margin: 8px 0 14px;
+  padding: 14px;
+  border-radius: 14px;
+  background: linear-gradient(var(--gok-orta), var(--gok-alt));
+  color: #fff;
+}
+
+.invite-own h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.invite-own p {
+  margin: 0 0 12px;
+  color: var(--yazi-soluk);
+  font-size: 15px;
+}
+
+.invite-own .btn {
+  width: 100%;
+}
+
+/* Mesaj gösterisi */
+.show-dialog {
+  max-width: 560px;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0 auto;
+  border-radius: 0;
+  background: linear-gradient(var(--gok-ust), var(--gok-orta) 60%, var(--gok-alt));
+  color: #fff;
+}
+
+.show-dialog .dialog-body {
+  height: 100%;
+  padding: 0;
+}
+
+.show-dialog .dialog-body::before {
+  display: none;
+}
+
+.show {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: max(14px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.show-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.show-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--yazi-soluk);
+}
+
+.show-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  animation: card-in 0.35s ease-out;
+}
+
+@keyframes card-in {
+  from { transform: translateY(16px) scale(0.98); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.show-icon {
+  width: 92px;
+  height: 96px;
+  animation: idle 1.8s ease-in-out infinite alternate;
+  transform-origin: 50% 0;
+}
+
+.show-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.show-body {
+  margin: 0;
+  max-width: 28ch;
+  font-size: clamp(20px, 5.6vw, 26px);
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.show-name {
+  margin: 0;
+  font-weight: 500;
+  color: var(--altin);
+}
+
+.show-pick {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.show-pick .share-row {
+  width: 100%;
+  max-width: 320px;
+}
+
+.show-pick .hint {
+  color: var(--yazi-soluk);
+}
+
+.show .btn-small {
+  color: #fff;
+  background: rgb(255 255 255 / 0.14);
+}
+
+.show .btn-small.btn-accent {
+  background: var(--kirmizi);
+}
+
+.show-nav {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.show-nav .btn-small:last-child {
+  justify-self: end;
+}
+
+.show-keepsake {
+  font-size: 14px;
+  color: var(--yazi-soluk);
+}
+
+/* Anı sayfası: ekranda sade, yazdırınca beyaz kağıt */
+.keepsake {
+  position: relative;
+  z-index: 4;
+  background: var(--kar);
+  color: var(--koyu);
+  min-height: 100dvh;
+  padding: 32px 18px 40px;
+}
+
+.keepsake-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.keepsake h1 {
+  font-size: clamp(28px, 7vw, 40px);
+}
+
+.keepsake-lead {
+  margin: 6px 0 18px;
+  color: var(--koyu-soluk);
+}
+
+.keepsake-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.keepsake-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 260px;
+  column-gap: 14px;
+}
+
+@media print {
+  .sky,
+  .header,
+  .footer,
+  .keepsake-actions {
+    display: none !important;
+  }
+
+  body,
+  .keepsake {
+    background: #fff;
+  }
+
+  .keepsake {
+    padding: 0;
+  }
+
+  .tag {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+/* Ana sayfa: ağaç sahibine son ziyaretinden beri asılan süsler */
+.new-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--kirmizi, #c8323c);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.5;
+  vertical-align: middle;
+  animation: badge-pop 0.5s ease-out both;
+}
+@keyframes badge-pop {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .new-badge { animation: none; }
+}
+
+.bar .btn-round {
+  position: relative;
+}
+
+.bar .new-badge {
+  position: absolute;
+  top: -9px;
+  right: -4px;
+  margin: 0;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.3);
 }

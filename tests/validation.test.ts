@@ -51,7 +51,7 @@ describe('hangOrnamentSchema', () => {
   it('geçersiz ağaç kimliğini ve süs türünü reddeder', () => {
     expect(hangOrnamentSchema.safeParse({ ...base, treeId: "abc'; drop" }).success).toBe(false)
     expect(hangOrnamentSchema.safeParse({ ...base, treeId: 'ABCDEFGH23' }).success).toBe(false)
-    expect(hangOrnamentSchema.safeParse({ ...base, kind: 12 }).success).toBe(false)
+    expect(hangOrnamentSchema.safeParse({ ...base, kind: 20 }).success).toBe(false)
     expect(hangOrnamentSchema.safeParse({ ...base, kind: -1 }).success).toBe(false)
   })
 

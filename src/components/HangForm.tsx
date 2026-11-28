@@ -11,7 +11,7 @@ export function HangForm({ lang, treeId, siteKey, onDone, onCancel }: {
   lang: Lang
   treeId: string
   siteKey: string
-  onDone: (index: number) => void
+  onDone: (index: number, id: string) => void
   onCancel: () => void
 }) {
   const t = dict(lang)
@@ -23,6 +23,17 @@ export function HangForm({ lang, treeId, siteKey, onDone, onCancel }: {
   const [error, setError] = useState<string | null>(null)
   const [widgetKey, setWidgetKey] = useState(0)
   const [pending, start] = useTransition()
+  const [suggestAt, setSuggestAt] = useState(0)
+  const ideas = t.suggest.items
+  const shown = [0, 1, 2].map((k) => ideas[(suggestAt + k) % ideas.length])
+
+  // Öneri metni boş kutuya yazılır, doluysa sonuna eklenir; sınırı aşmaz.
+  const addIdea = (idea: string) => {
+    setBody((b) => {
+      const next = b.trim() === '' ? idea : `${b.trimEnd()} ${idea}`
+      return [...next].length > MAX_BODY ? b : next
+    })
+  }
 
   const length = [...body].length
 
@@ -33,7 +44,7 @@ export function HangForm({ lang, treeId, siteKey, onDone, onCancel }: {
     start(async () => {
       const r = await hangOrnamentAction({ treeId, kind, authorName, body, isPublic, token })
       if (r.ok) {
-        onDone(r.index)
+        onDone(r.index, r.id)
         return
       }
       const messages: Record<string, string> = {
@@ -69,6 +80,19 @@ export function HangForm({ lang, treeId, siteKey, onDone, onCancel }: {
         <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} maxLength={MAX_NAME} autoComplete="nickname" />
         <span className="hint">{t.hang.nameHint}</span>
       </label>
+      <div className="suggest">
+        <span className="hint">{t.suggest.label}</span>
+        <div className="suggest-row">
+          {shown.map((idea) => (
+            <button key={idea} type="button" className="chip" onClick={() => addIdea(idea)}>
+              {idea}
+            </button>
+          ))}
+          <button type="button" className="chip chip-more" onClick={() => setSuggestAt((n) => (n + 3) % ideas.length)}>
+            {t.suggest.more}
+          </button>
+        </div>
+      </div>
       <label className="field">
         <span className="field-label">{t.hang.bodyLabel}</span>
         <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={5} required />

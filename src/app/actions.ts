@@ -7,7 +7,7 @@ import { LIMITS, hit } from '@/lib/rate-limit'
 import { clearOwnerCookie, clientIp, readOwnerKey, setOwnerCookie } from '@/lib/server'
 import * as repo from '@/lib/trees'
 import { verifyTurnstile } from '@/lib/turnstile'
-import { createTreeSchema, hangOrnamentSchema, treeIdSchema } from '@/lib/validation'
+import { createTreeSchema, customizeSchema, hangOrnamentSchema, treeIdSchema } from '@/lib/validation'
 
 type Fail<E extends string> = { ok: false; error: E }
 
@@ -30,7 +30,7 @@ export async function createTreeAction(input: unknown): Promise<CreateTreeResult
 }
 
 export type HangResult =
-  | { ok: true; index: number }
+  | { ok: true; index: number; id: string }
   | Fail<'invalid' | 'bot' | 'rate' | 'closed' | 'revealed' | 'full' | 'missing' | 'generic'>
 
 export async function hangOrnamentAction(input: unknown): Promise<HangResult> {
@@ -67,6 +67,12 @@ async function asOwner(treeId: unknown, run: (db: Awaited<ReturnType<typeof getD
     console.error('ownerAction', error)
     return { ok: false, error: 'generic' }
   }
+}
+
+export async function customizeTreeAction(treeId: unknown, input: unknown): Promise<OwnerResult> {
+  const parsed = customizeSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, error: 'invalid' }
+  return asOwner(treeId, (db, id) => repo.updateLook(db, id, parsed.data))
 }
 
 export async function renameTreeAction(treeId: unknown, name: unknown): Promise<OwnerResult> {

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { Header } from '@/components/Header'
@@ -8,7 +9,7 @@ import { dict, isLang, localePath } from '@/lib/i18n'
 import { TREE_ID_PATTERN } from '@/lib/ids'
 import { isRevealed, revealYear } from '@/lib/reveal'
 import { readOwnerKey, siteUrl } from '@/lib/server'
-import { countOrnaments, getTree, isOwner, listOrnaments, MAX_ORNAMENTS, PAGE_SIZE } from '@/lib/trees'
+import { countOrnaments, getTree, isOwner, listOrnaments, lookOf, MAX_ORNAMENTS, PAGE_SIZE } from '@/lib/trees'
 
 type Params = Promise<{ lang: string; id: string }>
 
@@ -57,9 +58,17 @@ export default async function TreePage({ params, searchParams }: { params: Param
   const messages = revealed ? (await listOrnaments(db, tree, { owner, now, all: true })).filter((o) => o.body !== null) : []
   const site = siteUrl()
   const treeLang = tree.lang === 'en' ? 'en' : 'tr'
+  const look = lookOf(tree)
+  const nonce = (await headers()).get('x-nonce') ?? undefined
 
   return (
     <>
+      <script
+        nonce={nonce}
+        // Gökyüzü ve kar seçimi sayfa çizilmeden html etiketine yazılır; ilk karede doğru sahne görünür.
+        // Değerler doğrulanmış küçük sayılar, kullanıcı metni içermez.
+        dangerouslySetInnerHTML={{ __html: `document.documentElement.dataset.sky="${look.sky}";document.documentElement.dataset.snow="${look.snow}"` }}
+      />
       <Header lang={lang} otherPath={localePath(lang === 'tr' ? 'en' : 'tr', `/a/${tree.id}`)} />
       <TreeScreen
         lang={lang}
@@ -70,6 +79,8 @@ export default async function TreePage({ params, searchParams }: { params: Param
           accepting: tree.accepting,
           revealAt: tree.revealAt.toISOString(),
           year: revealYear(tree.revealAt),
+          look,
+          note: tree.note,
         }}
         nowMs={now.getTime()}
         owner={owner}

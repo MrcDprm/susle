@@ -1,5 +1,6 @@
 import { COLORS as C } from './palette'
 import { g, h, toSvgString, type SvgNode } from './node'
+import { base, halo, LIGHT_SETS, ribbon, sparkles, topper } from './decor'
 import { ornamentNodes } from './ornaments'
 
 export const TREE_VIEWBOX = '0 0 400 560'
@@ -72,32 +73,23 @@ function edgeLine(t: Tier, droop: number): string {
   return `M${(200 - t.hw).toFixed(1)} ${t.bottom.toFixed(1)}${edge(t, droop)}`
 }
 
-function starPath(cx: number, cy: number, outer: number, inner: number): string {
-  const pts: string[] = []
-  for (let i = 0; i < 10; i++) {
-    const r = i % 2 === 0 ? outer : inner
-    const a = -Math.PI / 2 + (i * Math.PI) / 5
-    pts.push(`${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`)
-  }
-  return `M${pts.join(' L')} Z`
-}
-
-const BULB_COLORS = [C.altin, C.kirmizi, C.mavi, C.yesilAmpul]
 
 // Her katın ortasından sarkan bir ampul dizisi. Ampuller sayfada sırayla yanıp söner.
-function garland(t: Tier, tierIndex: number, wire: string): SvgNode {
+// Renkler sahibin seçtiği ışık setinden gelir; ağaç büyüdükçe ampul sayısı artar.
+function garland(t: Tier, tierIndex: number, wire: string, colors: string[], dense: boolean): SvgNode | null {
+  if (colors.length === 0) return null
   const y0 = t.top + (t.bottom - t.top) * 0.62
   const w = t.hw * 0.52
   const p0 = [200 - w, y0]
   const p1 = [200, y0 + 30]
   const p2 = [200 + w, y0 - 4]
-  const n = Math.max(3, Math.round(w / 22))
+  const n = Math.max(3, Math.round((w / 22) * (dense ? 1.6 : 1)))
   const bulbs: SvgNode[] = []
   for (let i = 0; i < n; i++) {
     const s = (i + 0.5) / n
     const x = (1 - s) ** 2 * p0[0] + 2 * (1 - s) * s * p1[0] + s * s * p2[0]
     const y = (1 - s) ** 2 * p0[1] + 2 * (1 - s) * s * p1[1] + s * s * p2[1]
-    const color = BULB_COLORS[(i + tierIndex) % BULB_COLORS.length]
+    const color = colors[(i + tierIndex) % colors.length]
     bulbs.push(
       g({ class: 'bulb' }, [
         h('circle', { cx: x.toFixed(1), cy: (y + 3).toFixed(1), r: 10, fill: color, opacity: 0.22 }),
@@ -136,10 +128,19 @@ export function presentCount(ornaments: number): number {
   return Math.min(PRESENTS.length, Math.ceil(ornaments / 5))
 }
 
+export type TreeLook = { topper: number; lights: number; ribbon: number; base: number }
+
 // Her kat yukarıdan aşağı koyudan açığa boyanır, sağ yanına gölge düşer; dallar ışığı soldan alır.
-export function treeBody(style: number, opts: { presents?: number; prefix?: string } = {}): SvgNode {
+// growth: 1'de etrafta yıldızlar, 2'de daha çok ampul, 3'te arkada ışık halkası.
+export function treeBody(
+  style: number,
+  opts: { presents?: number; prefix?: string; look?: Partial<TreeLook>; growth?: number } = {},
+): SvgNode {
   const def = STYLES[style] ?? STYLES[0]
   const id = opts.prefix ?? 't'
+  const look = { topper: 0, lights: 0, ribbon: 0, base: 0, ...opts.look }
+  const growth = opts.growth ?? 0
+  const colors = LIGHT_SETS[look.lights] ?? LIGHT_SETS[0]
   const tiers = tiersFor(def)
   const defs = h('defs', undefined, [
     h('linearGradient', { id: `${id}-g`, x1: 0, y1: 0, x2: 0, y2: 1 }, [
@@ -182,23 +183,22 @@ export function treeBody(style: number, opts: { presents?: number; prefix?: stri
     } else if (def.snow === 'frost') {
       drawn.push(h('path', { d: edgeLine(t, def.droop), fill: 'none', stroke: C.kar, 'stroke-width': 2.4, 'stroke-linecap': 'round', opacity: 0.85 }))
     }
-    drawn.push(garland(t, i, def.wire))
+    // Üstteki kat alttakinin yaklaşık yarısını örter; kurdele her katın açıkta kalan bandına çizilir.
+    const ribbonY = t.top + (t.bottom - t.top) * (i === 0 ? 0.36 : 0.5)
+    const r = ribbon(look.ribbon, ribbonY, t.hw, `url(#${id}-c${i})`)
+    if (r) drawn.push(r)
+    const gl = garland(t, i, def.wire, colors, growth >= 2)
+    if (gl) drawn.push(gl)
   }
 
   return g(undefined, [
     defs,
+    ...(growth >= 3 ? [halo()] : []),
     h('ellipse', { cx: 200, cy: 548, rx: 150, ry: 10, fill: '#0B1630', opacity: 0.25 }),
     h('rect', { x: 186, y: 450, width: 28, height: 60, rx: 3, fill: C.kahve }),
-    h('path', { d: 'M150 502 L250 502 L240 548 L160 548 Z', fill: C.kirmizi }),
-    h('rect', { x: 144, y: 496, width: 112, height: 14, rx: 4, fill: C.kar }),
-    g({ class: 'tree-body' }, [
-      ...drawn,
-      g({ class: 'star-glow' }, [
-        h('circle', { cx: 200, cy: 50, r: 44, fill: '#FFE9A8', opacity: 0.06 }),
-        h('circle', { cx: 200, cy: 50, r: 32, fill: '#FFE9A8', opacity: 0.1 }),
-      ]),
-      h('path', { d: starPath(200, 50, 27, 12), fill: C.altin }),
-    ]),
+    ...base(look.base),
+    g({ class: 'tree-body' }, [...drawn, topper(look.topper)]),
+    ...(growth >= 1 ? [sparkles()] : []),
     ...presents(opts.presents ?? 0),
   ])
 }
@@ -241,11 +241,18 @@ export function hangingOrnament(kind: number, index: number): SvgNode {
 }
 
 // Paylaşım görselleri için ağacın tamamı tek SVG metni olarak.
-export function treeSvgString(style: number, kinds: number[], width: number, total = kinds.length): string {
+export function treeSvgString(
+  style: number,
+  kinds: number[],
+  width: number,
+  total = kinds.length,
+  look?: Partial<TreeLook>,
+  growth = 0,
+): string {
   const height = Math.round((width * 560) / 400)
   return toSvgString(
     h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: TREE_VIEWBOX, width, height }, [
-      treeBody(style, { presents: presentCount(total), prefix: 's' }),
+      treeBody(style, { presents: presentCount(total), prefix: 's', look, growth }),
       ...kinds.slice(0, SLOTS.length).map((k, i) => hangingOrnament(k, i)),
     ]),
   )

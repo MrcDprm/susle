@@ -33,6 +33,42 @@ Bugün 27 Kasım. İnsanların linki Aralık başında paylaşabilmesi için hed
 - 1 Ocak hatırlatıcısı: alarmlı takvim dosyası ve Google Takvim linki. Web bildirimi yerine bu seçildi; Vercel'in ücretsiz zamanlanmış görevi dakikasında çalışmıyor, iPhone'da web bildirimi ana ekrana eklenmeyi gerektiriyor.
 - Gece yarısı kutlaması.
 
+## Aralık sürümü, 28 Kasım
+
+Amaç: her ağaç kendine has olsun, insanlar siteye kendi istekleriyle geri gelsin. Kullanıcı kararı: aşağıdakilerin hepsi.
+
+**Ağacını süsle ekranı, sahip için.** Canlı önizlemeli bir sayfa; seçilen her şey ağaçta ve paylaşım görsellerinde görünür.
+- Ağaç türü: mevcut 6 tür.
+- Tepe süsü: yıldız, kalp, ay, kar tanesi, nazar boncuğu, fiyonk.
+- Işıklar: renkli, sıcak beyaz, altın, buz mavisi, kırmızı yeşil, kapalı.
+- Sim: yok, altın sim, gümüş sim, kırmızı kurdele.
+- Saksı: kırmızı saksı, hasır sepet, ahşap kasa, karlı kütük.
+- Manzara: karlı köy, çam ormanı, şehir.
+- Gökyüzü: gece, kuzey ışıkları, alacakaranlık.
+- Kar: hafif, yoğun, yok.
+- Müzik: Jingle Bells, We Wish You a Merry Christmas, Deck the Halls. Üçü de kamu malı, kodla çalınır.
+- Sahibin notu: ağaç adının altında en fazla 80 karakter.
+Ağaç açılıp paylaşım penceresi kapanınca süsleme ekranı kendiliğinden gelir; sonra Süsle düğmesinden açılır.
+
+**Büyüyen ağaç.** 10 süste ağacın etrafında yıldızlar parlar, 25'te ampuller çoğalır, 50'de ağacın arkasına ışık halkası gelir. Hediye kutuları zaten artıyor. Sayacın altında bir sonraki eşiğe kaç süs kaldığı yazar.
+
+**Ziyaretçi.**
+- 8 yeni süs, toplam 20: Milli Piyango bileti, kestane, lokum, tombala kartı, simit, salep fincanı, kartopu, fiyonk.
+- Dilek önerileri: mesaj kutusunun üstünde dokununca yazılan hazır cümleler.
+- Süs asınca davet kartı: hatırlatıcı, bu ağacı başkalarına gönderme ve kendi ağacını açma.
+- Kendi asılan süs ağaçta işaretli görünür, kartında Senin süsün yazar. Tarayıcıda saklanır, hesap gerekmez.
+
+**1 Ocak.**
+- Mesaj gösterisi: mesajlar tam ekran kartlarda tek tek, kaydırarak ya da düğmeyle okunur.
+- Yılın mesajı: sahip herkese açık bir mesajı seçip hikaye görseline çevirir. Gizli mesajlar seçilemez, yazanın tercihi korunur.
+- Anı sayfası: bütün mesajlar yazdırılabilir ya da PDF olarak kaydedilebilir tek sayfada.
+
+**Paylaşım ve dönüş.**
+- Hikaye görselinde açılıştan önce Yılbaşına N gün kaldı yazar; seçilen görünüm görsele de yansır.
+- Ana sayfadaki Ağaçların listesinde son ziyaretten beri gelen yeni süs sayısı görünür.
+
+**Veri.** `trees` tablosuna `look jsonb` ve `note text` eklenir; yalnızca ekleme, eski ağaçlar varsayılan görünümü alır. Görünüm sunucuda Zod ile doğrulanır, bilinmeyen alan saklanmaz.
+
 ## Teknoloji
 
 | Parça | Seçim | Neden |

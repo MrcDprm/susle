@@ -2,7 +2,7 @@
 
 import { useId, useState, type KeyboardEvent, type MouseEvent } from 'react'
 import { ornamentNodes } from '@/lib/art/ornaments'
-import { ornamentTransform, presentCount, slotPlace, TREE_VIEWBOX, TWINE_COLOR, twinePath } from '@/lib/art/tree'
+import { ornamentTransform, presentCount, slotPlace, TREE_VIEWBOX, TWINE_COLOR, twinePath, type TreeLook } from '@/lib/art/tree'
 import { chime } from '@/lib/music'
 import { renderNode, TreeBase } from './Art'
 import { puffAt } from './scene/Snow'
@@ -18,11 +18,15 @@ type Props = {
   swingIndex?: number | null
   onSelect?: (index: number) => void
   className?: string
+  look?: Partial<TreeLook>
+  growth?: number
+  // Bu tarayıcıdan asılan süsler; ağaçta işaretli görünür.
+  mine?: ReadonlySet<string>
 }
 
 // Ağaç ve süsler tek SVG'de. Süsler klavyeyle de seçilebilen düğmelerdir.
 // Ağacın gövdesine dokununca ağaç sallanır ve dallardan kar silkelenir.
-export function TreeView({ style, ornaments, total, title, newIndex, swingIndex, onSelect, className }: Props) {
+export function TreeView({ style, ornaments, total, title, newIndex, swingIndex, onSelect, className, look, growth, mine }: Props) {
   const [shaking, setShaking] = useState(false)
   // Sayfada birden çok ağaç olabilir; degrade ve kırpma kimlikleri çakışmasın.
   const prefix = `tr${useId().replace(/[^a-zA-Z0-9]/g, '')}`
@@ -50,12 +54,12 @@ export function TreeView({ style, ornaments, total, title, newIndex, swingIndex,
     <svg viewBox={TREE_VIEWBOX} className={`tree ${className ?? ''}`} role="group" aria-label={title}>
       <g className={shaking ? 'shake' : undefined}>
         <g onClick={onTreeTap} className="tree-tap">
-          <TreeBase style={style} prefix={prefix} presents={presentCount(total ?? ornaments.length)} />
+          <TreeBase style={style} prefix={prefix} presents={presentCount(total ?? ornaments.length)} look={look} growth={growth} />
         </g>
         <g className="ornaments">
           {ornaments.map((o, i) => {
             const p = slotPlace(i)
-            const classes = ['orn', `o${i % 6}`, i === newIndex ? 'is-new' : '', i === swingIndex ? 'is-swinging' : ''].join(' ')
+            const classes = ['orn', `o${i % 6}`, i === newIndex ? 'is-new' : '', i === swingIndex ? 'is-swinging' : '', mine?.has(o.id) ? 'is-mine' : ''].join(' ')
             return (
               <g
                 key={o.id}
@@ -69,6 +73,7 @@ export function TreeView({ style, ornaments, total, title, newIndex, swingIndex,
                 <path d={twinePath(p)} stroke={TWINE_COLOR} strokeWidth={1.4} fill="none" className="twine" />
                 <g transform={ornamentTransform(p)}>
                   <g className="sway">
+                    <circle className="mine-ring" cx={0} cy={20} r={24} />
                     <circle className="focus-ring" cx={0} cy={20} r={23} />
                     <circle className="hit" cx={0} cy={19} r={21} />
                     {ornamentNodes(o.kind).map((n, k) => renderNode(n, k))}
