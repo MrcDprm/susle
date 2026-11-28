@@ -84,11 +84,11 @@ export function HangForm({ lang, treeId, siteKey, onDone, onCancel }: {
         <span className="hint">{t.suggest.label}</span>
         <div className="suggest-row">
           {shown.map((idea) => (
-            <button key={idea} type="button" className="chip" onClick={() => addIdea(idea)}>
+            <button key={idea} type="button" className="idea" onClick={() => addIdea(idea)}>
               {idea}
             </button>
           ))}
-          <button type="button" className="chip chip-more" onClick={() => setSuggestAt((n) => (n + 3) % ideas.length)}>
+          <button type="button" className="idea idea-more" onClick={() => setSuggestAt((n) => (n + 3) % ideas.length)}>
             {t.suggest.more}
           </button>
         </div>
