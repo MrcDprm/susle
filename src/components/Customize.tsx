@@ -68,7 +68,7 @@ export function Customize(p: Props) {
       const r = await customizeTreeAction(p.treeId, { style: draft.style, look: draft.look, note: draft.note })
       if (!r.ok) {
         setAsk(false)
-        setError(t.errors.generic)
+        setError(r.error === 'invalid' ? c.invalid : t.errors.generic)
         return
       }
       stopPreview()
